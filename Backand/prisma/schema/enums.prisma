@@ -1,0 +1,40 @@
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+}
+
+enum GearStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RentalStatus {
+  PLACED
+  CONFIRMED
+  CANCELLED
+  PAID
+  PICKED_UP
+  RETURNED
+}
+
+enum PaymentMethod {
+  STRIPE
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
