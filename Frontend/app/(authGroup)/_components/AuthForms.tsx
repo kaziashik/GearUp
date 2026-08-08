@@ -137,7 +137,7 @@ export function LoginForm() {
               onError={() => toast.error("Google sign-in failed")}
               theme="outline"
               size="large"
-              width="100%"
+              width="400"
             />
           </div>
         )}
