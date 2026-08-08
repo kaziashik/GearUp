@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
-import httpStatus from "http-status";
+import httpStatus from "../../utils/httpStatus";
 import { sendResponse } from "../../utils/sendResponse";
 import { paymentService } from "./payment.service";
 

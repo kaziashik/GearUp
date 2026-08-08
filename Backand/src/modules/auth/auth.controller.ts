@@ -5,7 +5,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { authService } from "./auth.service";
-import httpStatus from "http-status";
+import httpStatus from "../../utils/httpStatus";
 
 const registerSchema = z.object({
   email: z.string().email(),

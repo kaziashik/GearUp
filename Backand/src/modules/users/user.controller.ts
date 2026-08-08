@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { catchAsync } from "../../utils/catchAsync";
-import httpStatus from "http-status";
+import httpStatus from "../../utils/httpStatus";
 import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { userService } from "./user.service";

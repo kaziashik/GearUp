@@ -10,6 +10,15 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   minify: false,
-  external: ["@prisma/client", ".prisma/client"],
-  noExternal: [],
+  // Keep Prisma/pg outside the bundle; everything else is inlined for Vercel
+  external: [
+    "@prisma/client",
+    ".prisma/client",
+    "@prisma/adapter-pg",
+    "pg",
+  ],
+  // @vercel/node expects module.exports = app (not { default: app })
+  footer: {
+    js: "module.exports = module.exports.default || module.exports;",
+  },
 });

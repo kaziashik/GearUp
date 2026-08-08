@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { catchAsync } from "../../utils/catchAsync";
-import httpStatus from "http-status";
+import httpStatus from "../../utils/httpStatus";
 import { getParam } from "../../utils/getParam";
 import { sendResponse } from "../../utils/sendResponse";
 import { gearService } from "./gear.service";
