@@ -2,10 +2,17 @@ import app from "./app";
 import { config } from "./config";
 
 const startServer = () => {
-  app.listen(config.port, () => {
-    console.log(`🏋️ GearUp API running on port ${config.port}`);
+  const port = config.port || 5000;
+  app.listen(port, () => {
+    console.log(`🏋️ GearUp API running on port ${port}`);
     console.log(`Environment: ${config.env}`);
   });
 };
 
-startServer();
+// For local development
+if (process.env.NODE_ENV !== "production") {
+  startServer();
+}
+
+// Export for Vercel serverless
+export default app;
