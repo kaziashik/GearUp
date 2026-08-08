@@ -1,7 +1,8 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
 import { getParam } from "../../utils/getParam";
-import sendResponse from "../../utils/sendResponse";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { rentalService } from "./rental.service";
 
@@ -26,12 +27,8 @@ const createRental = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    statusCode: 201,
-    message: "Rental order created successfully",
-    data: rental,
-  });
+  sendResponse(res, { success: true, statusCode: 201, message: "Rental order created successfully", data: rental,
+   });
 });
 
 const getMyRentals = catchAsync(async (req, res) => {
@@ -39,11 +36,8 @@ const getMyRentals = catchAsync(async (req, res) => {
     (req as AuthRequest).user!.userId
   );
 
-  sendResponse({
-    res,
-    message: "Rental orders retrieved successfully",
-    data: rentals,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Rental orders retrieved successfully", data: rentals,
+   });
 });
 
 const getRentalById = catchAsync(async (req, res) => {
@@ -54,11 +48,8 @@ const getRentalById = catchAsync(async (req, res) => {
     authReq.user!.role
   );
 
-  sendResponse({
-    res,
-    message: "Rental order retrieved successfully",
-    data: rental,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Rental order retrieved successfully", data: rental,
+   });
 });
 
 const cancelRental = catchAsync(async (req, res) => {
@@ -67,11 +58,8 @@ const cancelRental = catchAsync(async (req, res) => {
     getParam(req.params.id)
   );
 
-  sendResponse({
-    res,
-    message: "Rental order cancelled successfully",
-    data: rental,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Rental order cancelled successfully", data: rental,
+   });
 });
 
 export const rentalController = {

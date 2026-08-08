@@ -1,7 +1,8 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
 import { getParam } from "../../utils/getParam";
-import sendResponse from "../../utils/sendResponse";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { providerGearService } from "../gear/gear.service";
 import { rentalService } from "../rental/rental.service";
@@ -33,12 +34,8 @@ const createGear = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    statusCode: 201,
-    message: "Gear item created successfully",
-    data: gear,
-  });
+  sendResponse(res, { success: true, statusCode: 201, message: "Gear item created successfully", data: gear,
+   });
 });
 
 const getMyGear = catchAsync(async (req, res) => {
@@ -46,11 +43,8 @@ const getMyGear = catchAsync(async (req, res) => {
     (req as AuthRequest).user!.userId
   );
 
-  sendResponse({
-    res,
-    message: "Gear inventory retrieved successfully",
-    data: gear,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Gear inventory retrieved successfully", data: gear,
+   });
 });
 
 const updateGear = catchAsync(async (req, res) => {
@@ -61,11 +55,8 @@ const updateGear = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    message: "Gear item updated successfully",
-    data: gear,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Gear item updated successfully", data: gear,
+   });
 });
 
 const deleteGear = catchAsync(async (req, res) => {
@@ -74,7 +65,7 @@ const deleteGear = catchAsync(async (req, res) => {
     getParam(req.params.id)
   );
 
-  sendResponse({ res, message: "Gear item deleted successfully" });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Gear item deleted successfully" });
 });
 
 const getProviderOrders = catchAsync(async (req, res) => {
@@ -82,11 +73,8 @@ const getProviderOrders = catchAsync(async (req, res) => {
     (req as AuthRequest).user!.userId
   );
 
-  sendResponse({
-    res,
-    message: "Provider orders retrieved successfully",
-    data: orders,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Provider orders retrieved successfully", data: orders,
+   });
 });
 
 const updateOrderStatus = catchAsync(async (req, res) => {
@@ -97,11 +85,8 @@ const updateOrderStatus = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    message: "Order status updated successfully",
-    data: order,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Order status updated successfully", data: order,
+   });
 });
 
 export const providerController = {

@@ -1,7 +1,8 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
 import { getParam } from "../../utils/getParam";
-import sendResponse from "../../utils/sendResponse";
+import { sendResponse } from "../../utils/sendResponse";
 import { gearService } from "./gear.service";
 
 const getAllGear = catchAsync(async (req, res) => {
@@ -18,22 +19,16 @@ const getAllGear = catchAsync(async (req, res) => {
 
   const result = await gearService.getAllGear(filters);
 
-  sendResponse({
-    res,
-    message: "Gear items retrieved successfully",
-    data: result.items,
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Gear items retrieved successfully", data: result.items,
     meta: result.meta,
-  });
+   });
 });
 
 const getGearById = catchAsync(async (req, res) => {
   const gear = await gearService.getGearById(getParam(req.params.id));
 
-  sendResponse({
-    res,
-    message: "Gear item retrieved successfully",
-    data: gear,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Gear item retrieved successfully", data: gear,
+   });
 });
 
 export const gearController = {
