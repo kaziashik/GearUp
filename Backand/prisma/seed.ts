@@ -8,28 +8,67 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+/**
+ * Product-matched Pexels images (verified HTTP 200).
+ * Keep query-less JPEG URLs so Next.js image optimization stays reliable.
+ */
+const px = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg`;
+
 const IMAGES = {
-  cycling1: "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=80",
-  cycling2: "https://images.unsplash.com/photo-1485965120188-e220f721d03e?w=800&q=80",
-  cycling3: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-  camping1: "https://images.unsplash.com/photo-1478131337064-12e57a4e5b4b?w=800&q=80",
-  camping2: "https://images.unsplash.com/photo-1504280390367-361c58d9b588?w=800&q=80",
-  camping3: "https://images.unsplash.com/photo-1523987352904-40be2359980d?w=800&q=80",
-  fitness1: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
-  fitness2: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
-  fitness3: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=80",
-  water1: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
-  water2: "https://images.unsplash.com/photo-1502680390469-be75c86b6360?w=800&q=80",
-  water3: "https://images.unsplash.com/photo-1527004014047-9a1358f1a6b0?w=800&q=80",
-  winter1: "https://images.unsplash.com/photo-1551524164-687aa64d8796?w=800&q=80",
-  winter2: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
-  climbing1: "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80",
-  catCycling: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=600&q=80",
-  catCamping: "https://images.unsplash.com/photo-1478131337064-12e57a4e5b4b?w=600&q=80",
-  catFitness: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80",
-  catWater: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80",
-  catWinter: "https://images.unsplash.com/photo-1551524164-687aa64d8796?w=600&q=80",
-  catClimbing: "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=600&q=80",
+  // Cycling (actual bikes / trail riding)
+  mtb1: px(2158963),
+  mtb2: px(100582),
+  mtb3: px(276517),
+  road1: px(248547),
+  road2: px(1149601),
+  road3: px(100582),
+  // Camping (tents / camp scenes)
+  tent1: px(1687845),
+  tent2: px(2422265),
+  tent3: px(2582818),
+  sleep1: px(1687848),
+  sleep2: px(2398220),
+  sleep3: px(2662116),
+  campKit1: px(1061640),
+  campKit2: px(6271625),
+  campKit3: px(1687848),
+  // Fitness / gym
+  gym1: px(841130),
+  gym2: px(1552242),
+  gym3: px(1954524),
+  gym4: px(2294361),
+  yoga1: px(3823039),
+  yoga2: px(4056723),
+  yoga3: px(317157),
+  // Hiking
+  hike1: px(1271619),
+  hike2: px(868097),
+  hike3: px(1365425),
+  // Water sports
+  kayak1: px(2744222),
+  kayak2: px(1430677),
+  kayak3: px(1666021),
+  paddle1: px(1430676),
+  paddle2: px(1654496),
+  paddle3: px(2744222),
+  snorkel1: px(1078983),
+  snorkel2: px(1645028),
+  snorkel3: px(1430677),
+  // Winter / climbing
+  ski1: px(848618),
+  ski2: px(352093),
+  ski3: px(848612),
+  climb1: px(1576937),
+  climb2: px(1496373),
+  climb3: px(1365425),
+  // Category covers
+  catCycling: px(100582),
+  catCamping: px(1687845),
+  catFitness: px(841130),
+  catWater: px(2744222),
+  catWinter: px(848618),
+  catClimbing: px(1576937),
 };
 
 async function clearDemoData() {
@@ -154,172 +193,293 @@ async function main() {
   const [cycling, camping, fitness, water, winter, climbing] = categories;
 
   const gearItems = await Promise.all([
+    // 0 — mountain bike
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: cycling.id,
         name: "TrailMaster X7 Mountain Bike",
-        description: "Premium 27.5\" aluminum mountain bike with 21-speed Shimano gears. Perfect for trails and off-road adventures. Helmet available on request.",
+        description:
+          "Trail-ready 27.5\" mountain bike with Shimano 21-speed shifting and front suspension. Built for forest paths, rocky trails, and weekend off-road rides. Helmet available on request.",
         brand: "TrailMaster",
         pricePerDay: 45,
         quantity: 6,
         availableQuantity: 5,
-        specifications: { frame: "Aluminum 6061", gears: 21, wheelSize: "27.5\"", suspension: "Front" },
-        images: [IMAGES.cycling1, IMAGES.cycling2],
+        specifications: {
+          frame: "Aluminum 6061",
+          gears: 21,
+          wheelSize: "27.5\"",
+          suspension: "Front",
+          bestFor: "Trail & off-road",
+        },
+        images: [IMAGES.mtb1, IMAGES.mtb2, IMAGES.mtb3],
       },
     }),
+    // 1 — road bike
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: cycling.id,
         name: "SpeedMax Carbon Road Bike",
-        description: "Lightweight carbon road bike for long-distance rides and city touring. 18-speed smooth shifting with drop handlebars.",
+        description:
+          "Lightweight carbon road bike for long scenic rides and city touring. Crisp 18-speed shifting, drop bars, and endurance geometry for all-day comfort.",
         brand: "SpeedMax",
         pricePerDay: 55,
         quantity: 4,
         availableQuantity: 4,
-        specifications: { frame: "Carbon Fiber", gears: 18, wheelSize: "700c" },
-        images: [IMAGES.cycling2, IMAGES.cycling3],
+        specifications: {
+          frame: "Carbon Fiber",
+          gears: 18,
+          wheelSize: "700c",
+          bestFor: "Road & touring",
+        },
+        images: [IMAGES.road1, IMAGES.road2, IMAGES.road3],
       },
     }),
+    // 2 — tent
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: camping.id,
-        name: "OutdoorLife 4-Person Tent",
-        description: "Spacious waterproof dome tent with rainfly. 15-minute setup, fits 4 adults. Ideal for family camping weekends.",
+        name: "OutdoorLife 4-Person Dome Tent",
+        description:
+          "Spacious waterproof dome tent with full rainfly and ~15-minute setup. Sleeps up to 4 adults — ideal for lakeside weekends, mountain camping, and festival trips.",
         brand: "OutdoorLife",
         pricePerDay: 28,
         quantity: 10,
         availableQuantity: 8,
-        specifications: { capacity: 4, weight: "5.2kg", waterproof: "3000mm" },
-        images: [IMAGES.camping1, IMAGES.camping2],
+        specifications: {
+          capacity: "4 people",
+          weight: "5.2kg",
+          waterproof: "3000mm",
+          setupTime: "15 minutes",
+        },
+        images: [IMAGES.tent1, IMAGES.tent2, IMAGES.tent3],
       },
     }),
+    // 3 — sleeping bag
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: camping.id,
         name: "Summit Pro Sleeping Bag (-10°C)",
-        description: "Mummy-style sleeping bag rated to -10°C. Compressible and lightweight for cold-weather camping.",
+        description:
+          "Warm mummy-style sleeping bag rated to -10°C with compressible synthetic fill. Packs small for backpacking and stays cozy on cold nights.",
         brand: "Summit Pro",
         pricePerDay: 12,
         quantity: 15,
         availableQuantity: 14,
-        specifications: { tempRating: "-10°C", fill: "Synthetic", weight: "1.8kg" },
-        images: [IMAGES.camping3],
+        specifications: {
+          tempRating: "-10°C",
+          fill: "Synthetic",
+          weight: "1.8kg",
+          shape: "Mummy",
+        },
+        images: [IMAGES.sleep1, IMAGES.sleep2, IMAGES.sleep3],
       },
     }),
+    // 4 — skis
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: winter.id,
-        name: "SnowPeak All-Mountain Skis",
-        description: "Versatile all-mountain skis with bindings and poles included. For intermediate to advanced skiers.",
+        name: "SnowPeak All-Mountain Ski Package",
+        description:
+          "Complete ski package with bindings and poles. Tuned for intermediate to advanced riders who want confidence on groomers and soft powder days.",
         brand: "SnowPeak",
         pricePerDay: 65,
         quantity: 8,
         availableQuantity: 7,
-        specifications: { length: "170cm", width: "88mm", includes: "Bindings + Poles" },
-        images: [IMAGES.winter1, IMAGES.winter2],
+        specifications: {
+          length: "170cm",
+          width: "88mm",
+          includes: "Bindings + Poles",
+          level: "Intermediate–Advanced",
+        },
+        images: [IMAGES.ski1, IMAGES.ski2, IMAGES.ski3],
       },
     }),
+    // 5 — climbing
     prisma.gearItem.create({
       data: {
         providerId: provider1.id,
         categoryId: climbing.id,
         name: "RockSafe Climbing Harness Kit",
-        description: "Full kit: harness, helmet, belay device, carabiners, and chalk bag. UIAA certified.",
+        description:
+          "Full climbing kit: harness, helmet, belay device, locking carabiners, and chalk bag. UIAA certified and cleaned after every rental.",
         brand: "RockSafe",
         pricePerDay: 22,
         quantity: 12,
         availableQuantity: 11,
-        specifications: { maxWeight: "120kg", certification: "UIAA" },
-        images: [IMAGES.climbing1],
+        specifications: {
+          maxWeight: "120kg",
+          certification: "UIAA",
+          includes: "Harness, helmet, belay, carabiners",
+        },
+        images: [IMAGES.climb1, IMAGES.climb2, IMAGES.climb3],
       },
     }),
+    // 6 — dumbbells
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
         categoryId: fitness.id,
         name: "FitPro Adjustable Dumbbell Set",
-        description: "Adjustable dumbbells 5kg–25kg per hand with quick-adjust dial. Perfect for home workouts.",
+        description:
+          "Adjustable dumbbells from 5kg to 25kg per hand with a quick-dial system. Perfect for strength training and home gym sessions without bulky plates.",
         brand: "FitPro",
         pricePerDay: 18,
         quantity: 8,
         availableQuantity: 7,
-        specifications: { minWeight: "5kg", maxWeight: "25kg" },
-        images: [IMAGES.fitness1, IMAGES.fitness2],
+        specifications: {
+          minWeight: "5kg",
+          maxWeight: "25kg",
+          style: "Quick-adjust dial",
+          bestFor: "Strength & toning",
+        },
+        images: [IMAGES.gym1, IMAGES.gym2, IMAGES.gym4],
       },
     }),
+    // 7 — home strength
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
         categoryId: fitness.id,
-        name: "PowerRack Home Gym Station",
-        description: "Power rack with pull-up bar, dip station, and safety bars. Supports squats and bench press.",
-        brand: "PowerRack",
-        pricePerDay: 35,
-        quantity: 3,
-        availableQuantity: 3,
-        specifications: { maxLoad: "300kg", height: "210cm" },
-        images: [IMAGES.fitness3],
+        name: "PowerFlow Home Strength Kit",
+        description:
+          "Home strength kit with resistance bands, yoga mat, and training accessories. Built for full-body workouts, mobility work, and daily training at home.",
+        brand: "PowerFlow",
+        pricePerDay: 25,
+        quantity: 5,
+        availableQuantity: 5,
+        specifications: {
+          includes: "Bands + mat + handles",
+          resistanceLevels: "5",
+          bestFor: "Home workouts",
+        },
+        images: [IMAGES.gym3, IMAGES.gym4, IMAGES.yoga1],
       },
     }),
+    // 8 — kayak
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
         categoryId: water.id,
         name: "AquaRide 2-Person Inflatable Kayak",
-        description: "Stable two-person inflatable kayak. Includes paddles, pump, and repair kit.",
+        description:
+          "Stable two-person inflatable kayak for lakes and calm rivers. Includes paddles, high-volume pump, and repair kit — packs easily in a car trunk.",
         brand: "AquaRide",
         pricePerDay: 38,
         quantity: 5,
         availableQuantity: 4,
-        specifications: { capacity: 2, length: "3.2m", type: "Inflatable" },
-        images: [IMAGES.water1, IMAGES.water2],
+        specifications: {
+          capacity: "2 people",
+          length: "3.2m",
+          type: "Inflatable",
+          includes: "Paddles + pump",
+        },
+        images: [IMAGES.kayak1, IMAGES.kayak2, IMAGES.kayak3],
       },
     }),
+    // 9 — paddleboard
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
         categoryId: water.id,
         name: "WaveGlide Stand-Up Paddleboard",
-        description: "All-around SUP for beginners and intermediates. Includes paddle, leash, and carry bag.",
+        description:
+          "All-around SUP for lake days and calm water. Beginner-friendly width with paddle, leash, and carry bag included.",
         brand: "WaveGlide",
         pricePerDay: 32,
         quantity: 6,
         availableQuantity: 6,
-        specifications: { length: "10'6\"", width: "32\"", capacity: "140kg" },
-        images: [IMAGES.water3, IMAGES.water1],
+        specifications: {
+          length: "10'6\"",
+          width: "32\"",
+          capacity: "140kg",
+          includes: "Paddle + leash + bag",
+        },
+        images: [IMAGES.paddle1, IMAGES.paddle2, IMAGES.paddle3],
       },
     }),
+    // 10 — yoga
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
-        categoryId: water.id,
-        name: "DeepBlue Snorkel & Dive Set",
-        description: "Snorkel set with mask, fins, and dry-top snorkel. Multiple sizes available.",
-        brand: "DeepBlue",
-        pricePerDay: 10,
-        quantity: 20,
-        availableQuantity: 18,
-        specifications: { sizes: ["S", "M", "L", "XL"] },
-        images: [IMAGES.water2],
+        categoryId: fitness.id,
+        name: "GlowFit Yoga & Mobility Set",
+        description:
+          "Premium yoga mat with blocks and stretch strap for studio-quality flow at home or outdoors. Non-slip surface and easy to clean.",
+        brand: "GlowFit",
+        pricePerDay: 14,
+        quantity: 12,
+        availableQuantity: 11,
+        specifications: {
+          matThickness: "6mm",
+          includes: "Mat + 2 blocks + strap",
+          surface: "Non-slip",
+        },
+        images: [IMAGES.yoga1, IMAGES.yoga2, IMAGES.yoga3],
       },
     }),
+    // 11 — camp kit
     prisma.gearItem.create({
       data: {
         providerId: provider2.id,
         categoryId: camping.id,
-        name: "CampChef Portable Stove Kit",
-        description: "Two-burner portable camp stove with cookware set and carrying case.",
-        brand: "CampChef",
-        pricePerDay: 15,
+        name: "TrailNest Camping Essentials Bundle",
+        description:
+          "Ready-to-camp cookware and packing essentials. Pair with our dome tent for a complete weekend getaway kit.",
+        brand: "TrailNest",
+        pricePerDay: 16,
         quantity: 10,
         availableQuantity: 9,
-        specifications: { burners: 2, fuel: "Propane" },
-        images: [IMAGES.camping2, IMAGES.camping1],
+        specifications: {
+          includes: "Cook set + utensils + pack straps",
+          fuel: "Bring your own canister",
+          bestFor: "Weekend camping",
+        },
+        images: [IMAGES.campKit1, IMAGES.campKit2, IMAGES.campKit3],
+      },
+    }),
+    // 12 — hiking pack
+    prisma.gearItem.create({
+      data: {
+        providerId: provider1.id,
+        categoryId: camping.id,
+        name: "SummitPath Day Hiking Pack (40L)",
+        description:
+          "Lightweight 40L hiking backpack with ventilated back panel, hydration sleeve, and multiple pockets. Built for day hikes and scenic mountain trips.",
+        brand: "SummitPath",
+        pricePerDay: 15,
+        quantity: 14,
+        availableQuantity: 13,
+        specifications: {
+          capacity: "40L",
+          weight: "1.1kg",
+          features: "Hydration sleeve + rain cover",
+        },
+        images: [IMAGES.hike1, IMAGES.hike2, IMAGES.hike3],
+      },
+    }),
+    // 13 — gym starter
+    prisma.gearItem.create({
+      data: {
+        providerId: provider2.id,
+        categoryId: fitness.id,
+        name: "CorePulse Gym Starter Bundle",
+        description:
+          "Portable gym starter kit with jump rope, resistance loops, and foam roller. Clean, compact training gear without bulky machines.",
+        brand: "CorePulse",
+        pricePerDay: 12,
+        quantity: 16,
+        availableQuantity: 15,
+        specifications: {
+          includes: "Jump rope + loops + foam roller",
+          level: "Beginner–Intermediate",
+          bestFor: "Home or park workouts",
+        },
+        images: [IMAGES.gym2, IMAGES.gym3, IMAGES.yoga2],
       },
     }),
   ]);
@@ -457,8 +617,8 @@ async function main() {
 
   console.log("✅ Demo seed completed!\n");
   console.log("📦 Created:");
-  console.log("   • 6 categories (with images)");
-  console.log("   • 12 gear items (with Unsplash images)");
+  console.log("   • 6 categories (with verified Pexels images)");
+  console.log("   • 14 gear items (lifestyle galleries + clear descriptions)");
   console.log("   • 7 rental orders (all statuses)");
   console.log("   • 4 payments + 2 reviews\n");
   console.log("👤 Test Accounts (password for all non-admin: see below):");

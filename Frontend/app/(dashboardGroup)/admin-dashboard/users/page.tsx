@@ -101,14 +101,14 @@ export default function AdminUsersPage() {
       {/* Table */}
       <div className="rounded-xl border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="text-left p-4 font-semibold">Name</th>
-                <th className="text-left p-4 font-semibold">Email</th>
-                <th className="text-left p-4 font-semibold">Role</th>
-                <th className="text-left p-4 font-semibold">Status</th>
-                <th className="text-left p-4 font-semibold">Actions</th>
+                <th className="text-left p-3 md:p-4 font-semibold whitespace-nowrap">Name</th>
+                <th className="text-left p-3 md:p-4 font-semibold whitespace-nowrap">Email</th>
+                <th className="text-left p-3 md:p-4 font-semibold whitespace-nowrap">Role</th>
+                <th className="text-left p-3 md:p-4 font-semibold whitespace-nowrap">Status</th>
+                <th className="text-left p-3 md:p-4 font-semibold whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -127,9 +127,9 @@ export default function AdminUsersPage() {
               ) : (
                 filtered.map((u) => (
                   <tr key={u.id} className="border-b hover:bg-accent/5 transition-colors">
-                    <td className="p-4 font-medium">{u.name}</td>
-                    <td className="p-4 text-muted-foreground">{u.email}</td>
-                    <td className="p-4">
+                    <td className="p-3 md:p-4 font-medium whitespace-nowrap">{u.name}</td>
+                    <td className="p-3 md:p-4 text-muted-foreground whitespace-nowrap">{u.email}</td>
+                    <td className="p-3 md:p-4">
                       <Badge
                         variant={u.role === "ADMIN" ? "default" : "secondary"}
                         className="capitalize"
@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
                         {u.role.toLowerCase()}
                       </Badge>
                     </td>
-                    <td className="p-4">
+                    <td className="p-3 md:p-4">
                       <Badge
                         variant={u.status === "ACTIVE" ? "default" : "secondary"}
                         className={u.status === "ACTIVE" ? "bg-green-600" : "bg-red-600"}
@@ -145,13 +145,13 @@ export default function AdminUsersPage() {
                         {u.status}
                       </Badge>
                     </td>
-                    <td className="p-4">
+                    <td className="p-3 md:p-4 whitespace-nowrap">
                       {u.status === "ACTIVE" ? (
-                        <Button size="sm" variant="destructive" onClick={() => toggleStatus(u.id, "SUSPENDED")}>
+                        <Button size="sm" variant="destructive" onClick={() => toggleStatus(u.id, "SUSPENDED")} className="min-w-[90px]">
                           Suspend
                         </Button>
                       ) : (
-                        <Button size="sm" onClick={() => toggleStatus(u.id, "ACTIVE")}>
+                        <Button size="sm" onClick={() => toggleStatus(u.id, "ACTIVE")} className="min-w-[90px]">
                           Activate
                         </Button>
                       )}

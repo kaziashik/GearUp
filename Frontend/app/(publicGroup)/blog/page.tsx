@@ -11,7 +11,7 @@ const blogPosts = [
     author: "Sarah Johnson",
     date: "Aug 5, 2026",
     readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/14b8a6/fff?text=Camping+Gear",
   },
   {
     id: "2",
@@ -21,7 +21,7 @@ const blogPosts = [
     author: "Mike Chen",
     date: "Aug 3, 2026",
     readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/0ea5e9/fff?text=Mountain+Bike",
   },
   {
     id: "3",
@@ -31,7 +31,7 @@ const blogPosts = [
     author: "Emma Davis",
     date: "Aug 1, 2026",
     readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/f97316/fff?text=Winter+Sports",
   },
   {
     id: "4",
@@ -41,7 +41,7 @@ const blogPosts = [
     author: "Alex Thompson",
     date: "Jul 28, 2026",
     readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/14b8a6/fff?text=Hiking+Trails",
   },
   {
     id: "5",
@@ -51,7 +51,7 @@ const blogPosts = [
     author: "Jordan Lee",
     date: "Jul 25, 2026",
     readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/0ea5e9/fff?text=Kayaking",
   },
   {
     id: "6",
@@ -61,7 +61,7 @@ const blogPosts = [
     author: "Rachel Green",
     date: "Jul 22, 2026",
     readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=500&fit=crop",
+    image: "https://placehold.co/800x500/f97316/fff?text=Sustainability",
   },
 ];
 
@@ -72,10 +72,10 @@ export default function BlogPage() {
     <div>
       {/* Hero Section */}
       <section className="gradient-hero border-b">
-        <div className="container mx-auto px-4 py-16 md:py-20">
+        <div className="container mx-auto px-4 py-8 md:py-10">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">GearUp Blog</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">GearUp Blog</h1>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               Tips, guides, and stories from the outdoor adventure community. Stay informed and inspired.
             </p>
           </div>

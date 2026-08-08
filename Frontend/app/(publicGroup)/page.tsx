@@ -15,48 +15,62 @@ import {
   Quote,
   ChevronDown,
 } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiFetch } from "@/lib/server-api";
-import { GearItem } from "@/lib/types";
+import { API_URL } from "@/lib/api";
+import { GearItem, ApiResponse } from "@/lib/types";
 import { GearCard } from "./_components/GearCard";
+import { AnimatedHeroBackground } from "./_components/AnimatedHeroBackground";
 
 export default async function HomePage() {
-  const res = await apiFetch<GearItem[]>("/api/gear?limit=6&available=true");
-  const featured = res.data || [];
+  let featured: GearItem[] = [];
+  try {
+    const res = await fetch(`${API_URL}/api/gear?limit=6&available=true`, {
+      cache: "no-store",
+    });
+    const json = (await res.json()) as ApiResponse<GearItem[]>;
+    featured = json.data || [];
+  } catch {
+    featured = [];
+  }
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="gradient-hero border-b relative overflow-hidden">
+      {/* Hero Section with Animated Background */}
+      <section className="gradient-hero border-b relative overflow-hidden min-h-[600px] md:min-h-[700px] flex items-center">
+        {/* Animated Background */}
+        <AnimatedHeroBackground />
+        
         <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
           <div className="max-w-3xl animate-fade-in">
-            <p className="text-primary font-semibold mb-3 flex items-center gap-2">
+            <p className="text-primary font-semibold mb-3 flex items-center gap-2 animate-slide-down">
               <Dumbbell className="h-5 w-5" />
               Sports & Outdoor Rentals
             </p>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight animate-slide-up">
               Rent Premium Gear.{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent animate-gradient-x">
                 Adventure Instantly.
               </span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-xl leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed animate-fade-in-delay">
               From mountain bikes to camping tents — find verified gear from trusted providers,
               book your dates, and hit the trail in minutes.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" asChild className="group">
+            <div className="flex flex-wrap gap-4 animate-fade-in-delay-2">
+              <Button size="lg" asChild className="group shadow-lg hover:shadow-xl transition-all">
                 <Link href="/gear">
                   Browse Gear <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="shadow-md hover:shadow-lg transition-all">
                 <Link href="/register">Join as Provider</Link>
               </Button>
             </div>
           </div>
         </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce">
+        
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
           <ChevronDown className="h-6 w-6 text-muted-foreground" />
         </div>
       </section>
@@ -319,28 +333,5 @@ export default async function HomePage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function Dumbbell({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m6.5 6.5 11 11" />
-      <path d="m21 21-1-1" />
-      <path d="m3 3 1 1" />
-      <path d="m18 22 4-4" />
-      <path d="m2 6 4-4" />
-      <path d="m3 10 7-7" />
-      <path d="m14 21 7-7" />
-    </svg>
   );
 }

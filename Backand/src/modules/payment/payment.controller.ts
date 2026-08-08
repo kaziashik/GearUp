@@ -18,9 +18,9 @@ const createPayment = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    statusCode: 201,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
     message: result.message || "Payment session created successfully",
     data: result,
   });
@@ -30,18 +30,21 @@ const confirmPayment = catchAsync(async (req, res) => {
   const { sessionId } = req.body;
 
   if (!sessionId) {
-    return sendResponse({
-      res,
-      statusCode: 400,
+    return sendResponse(res, {
       success: false,
+      statusCode: httpStatus.BAD_REQUEST,
       message: "sessionId is required",
     });
   }
 
   const payment = await paymentService.confirmStripePayment(sessionId);
 
-  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Payment confirmed successfully", data: payment,
-   });
+  sendResponse(res, { 
+    success: true, 
+    statusCode: httpStatus.OK, 
+    message: "Payment confirmed successfully", 
+    data: payment,
+  });
 });
 
 const getMyPayments = catchAsync(async (req, res) => {

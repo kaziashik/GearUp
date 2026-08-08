@@ -10,16 +10,28 @@ async function setAuthCookies(accessToken: string, refreshToken: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 15,
+    maxAge: 60 * 60 * 24, // 1 day
     path: "/",
   });
   cookieStore.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
   });
+}
+
+function getDashboardPath(role: Role): string {
+  switch (role) {
+    case "ADMIN":
+      return "/admin-dashboard";
+    case "PROVIDER":
+      return "/provider-dashboard";
+    case "CUSTOMER":
+    default:
+      return "/customer-dashboard";
+  }
 }
 
 async function authRequest<T>(path: string, body: object): Promise<{ success: boolean; message: string; data?: T }> {
@@ -32,11 +44,24 @@ async function authRequest<T>(path: string, body: object): Promise<{ success: bo
 }
 
 export async function loginAction(email: string, password: string) {
-  const result = await authRequest<AuthResponse>("/api/auth/login", { email, password });
-  if (result.success && result.data) {
-    await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+  try {
+    const result = await authRequest<AuthResponse>("/api/auth/login", { email, password });
+    if (result.success && result.data) {
+      await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+      // Return success with dashboard path instead of redirecting
+      return {
+        success: true,
+        message: result.message,
+        dashboardPath: getDashboardPath(result.data.user.role),
+      };
+    }
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: "Login failed",
+    };
   }
-  return result;
 }
 
 export async function registerAction(data: {
@@ -48,17 +73,43 @@ export async function registerAction(data: {
   address?: string;
   image?: string;
 }) {
-  const result = await authRequest<AuthResponse>("/api/auth/register", data);
-  if (result.success && result.data) {
-    await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+  try {
+    const result = await authRequest<AuthResponse>("/api/auth/register", data);
+    if (result.success && result.data) {
+      await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+      // Return success with dashboard path instead of redirecting
+      return {
+        success: true,
+        message: result.message,
+        dashboardPath: getDashboardPath(result.data.user.role),
+      };
+    }
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: "Registration failed",
+    };
   }
-  return result;
 }
 
 export async function googleLoginAction(idToken: string, role?: Role) {
-  const result = await authRequest<AuthResponse>("/api/auth/google", { idToken, role });
-  if (result.success && result.data) {
-    await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+  try {
+    const result = await authRequest<AuthResponse>("/api/auth/google", { idToken, role });
+    if (result.success && result.data) {
+      await setAuthCookies(result.data.accessToken, result.data.refreshToken);
+      // Return success with dashboard path instead of redirecting
+      return {
+        success: true,
+        message: result.message,
+        dashboardPath: getDashboardPath(result.data.user.role),
+      };
+    }
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: "Google login failed",
+    };
   }
-  return result;
 }

@@ -3,16 +3,29 @@
 import { cookies } from "next/headers";
 import { apiFetch } from "@/lib/server-api";
 import { User } from "@/lib/types";
+import { getAccessToken } from "./refreshToken";
 
 export async function getMe(): Promise<User | null> {
-  const res = await apiFetch<User>("/api/auth/me");
-  if (!res.success || !res.data) return null;
-  return res.data;
+  try {
+    const accessToken = await getAccessToken();
+
+    if (!accessToken) {
+      return null;
+    }
+
+    const res = await apiFetch<User>("/api/auth/me");
+    if (!res.success || !res.data) return null;
+    return res.data;
+  } catch (error) {
+    console.error("Get me error:", error);
+    return null;
+  }
 }
 
 export async function logoutAction() {
   const cookieStore = await cookies();
-  await apiFetch("/api/auth/logout", { method: "POST" });
+  
+  // Delete cookies (no need to call backend as tokens are stateless JWT)
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
 }
@@ -35,14 +48,14 @@ export async function refreshTokenAction() {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 15,
+      maxAge: 60 * 60 * 24, // 1 day
       path: "/",
     });
     cookieStore.set("refreshToken", res.data.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     });
     return res.data;

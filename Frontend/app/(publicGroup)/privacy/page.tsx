@@ -9,7 +9,7 @@ export default function PrivacyPage() {
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
               <Shield className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold">Privacy Policy</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">Privacy Policy</h1>
             </div>
             <p className="text-lg text-muted-foreground">
               Last updated: August 8, 2026

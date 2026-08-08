@@ -1,61 +1,120 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decodeTokenPayload, getDashboardPath } from "@/utils/jwt";
-import { Role } from "@/lib/types";
 
-const publicPaths = ["/", "/gear", "/about", "/contact", "/services", "/success", "/cancel"];
-const authPaths = ["/login", "/register"];
+const AUTH_ROUTES = ["/login", "/register"];
+const PUBLIC_ROUTES = [
+  "/",
+  "/gear",
+  "/about",
+  "/contact",
+  "/services",
+  "/blog",
+  "/help",
+  "/privacy",
+  "/terms",
+];
 
-function isPublicPath(pathname: string) {
-  if (publicPaths.includes(pathname)) return true;
-  if (pathname.startsWith("/gearDetails/")) return true;
-  return false;
+type TokenPayload = {
+  role?: string;
+  exp?: number;
+};
+
+/** Edge-safe JWT payload decode (no Node crypto / jsonwebtoken). */
+function decodeTokenPayload(token: string): TokenPayload | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(atob(normalized));
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
-function isAuthPath(pathname: string) {
-  return authPaths.some((p) => pathname.startsWith(p));
+function isTokenExpired(payload: TokenPayload | null): boolean {
+  if (!payload?.exp) return true;
+  // exp is in seconds
+  return payload.exp * 1000 <= Date.now();
 }
 
-function isDashboardPath(pathname: string) {
-  return (
-    pathname.startsWith("/customer-dashboard") ||
-    pathname.startsWith("/provider-dashboard") ||
-    pathname.startsWith("/admin-dashboard") ||
-    pathname.startsWith("/dashboard")
-  );
+function getDashboardPath(role: string): string {
+  switch (role) {
+    case "ADMIN":
+      return "/admin-dashboard";
+    case "PROVIDER":
+      return "/provider-dashboard";
+    case "CUSTOMER":
+    default:
+      return "/customer-dashboard";
+  }
+}
+
+function clearAuthCookies(response: NextResponse) {
+  response.cookies.delete("accessToken");
+  response.cookies.delete("refreshToken");
+  return response;
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get("accessToken")?.value;
-  const payload = token ? decodeTokenPayload(token) : null;
-  const role = payload?.role as Role | undefined;
+  const pathname = request.nextUrl.pathname;
+  const accessToken = request.cookies.get("accessToken")?.value;
 
-  if (isAuthPath(pathname) && token && role) {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
+  const payload = accessToken ? decodeTokenPayload(accessToken) : null;
+  const tokenValid = !!payload && !isTokenExpired(payload) && !!payload.role;
+  const userRole = tokenValid ? payload!.role! : null;
+
+  const isAuthRoute = AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  const isPublic =
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
+    ) ||
+    pathname.startsWith("/gearDetails/") ||
+    pathname.startsWith("/payment/");
+
+  // Valid session on login/register → go to dashboard
+  if (isAuthRoute && tokenValid && userRole) {
+    return NextResponse.redirect(
+      new URL(getDashboardPath(userRole), request.url)
+    );
   }
 
-  if (isDashboardPath(pathname) && !token) {
+  // Stale/invalid cookie on login/register → allow page, clear bad cookies
+  if (isAuthRoute && accessToken && !tokenValid) {
+    const response = NextResponse.next();
+    return clearAuthCookies(response);
+  }
+
+  // Protected routes require a valid token
+  if (!tokenValid && !isPublic && !isAuthRoute) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    loginUrl.searchParams.set("redirectTo", pathname);
+    const response = NextResponse.redirect(loginUrl);
+    if (accessToken) clearAuthCookies(response);
+    return response;
   }
 
-  if (pathname.startsWith("/customer-dashboard") && role && role !== "CUSTOMER" && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (pathname.startsWith("/provider-dashboard") && role && role !== "PROVIDER" && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (pathname.startsWith("/admin-dashboard") && role && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (!isPublicPath(pathname) && !isAuthPath(pathname) && !isDashboardPath(pathname) && pathname.startsWith("/payment")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
+  // Role-based access (only when authenticated)
+  if (tokenValid && userRole) {
+    if (
+      pathname.startsWith("/customer-dashboard") &&
+      userRole !== "CUSTOMER" &&
+      userRole !== "ADMIN"
+    ) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (pathname.startsWith("/admin-dashboard") && userRole !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (
+      pathname.startsWith("/provider-dashboard") &&
+      userRole !== "PROVIDER" &&
+      userRole !== "ADMIN"
+    ) {
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
@@ -63,5 +122,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$).*)",
+  ],
 };

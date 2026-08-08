@@ -7,15 +7,23 @@ import { Users, Package, ShoppingCart, DollarSign, TrendingUp, Activity } from "
 import { RevenueChart, OrdersChart, StatusPieChart, CategoryChart } from "@/components/charts/DashboardCharts";
 
 export default async function AdminDashboardPage() {
-  const [usersRes, gearRes, rentalsRes] = await Promise.all([
-    apiFetch<User[]>("/api/admin/users"),
-    apiFetch<GearItem[]>("/api/gear"),
-    apiFetch<RentalOrder[]>("/api/rentals"),
-  ]);
+  let users: User[] = [];
+  let gear: GearItem[] = [];
+  let rentals: RentalOrder[] = [];
+  
+  try {
+    const [usersRes, gearRes, rentalsRes] = await Promise.all([
+      apiFetch<User[]>("/api/admin/users"),
+      apiFetch<GearItem[]>("/api/gear"),
+      apiFetch<RentalOrder[]>("/api/rentals"),
+    ]);
 
-  const users = usersRes.data || [];
-  const gear = gearRes.data || [];
-  const rentals = rentalsRes.data || [];
+    users = usersRes.data || [];
+    gear = gearRes.data || [];
+    rentals = rentalsRes.data || [];
+  } catch (error) {
+    console.error("Admin dashboard data fetch error:", error);
+  }
 
   // Calculate total revenue
   const totalRevenue = rentals.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);

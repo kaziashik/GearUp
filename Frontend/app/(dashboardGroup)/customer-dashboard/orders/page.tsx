@@ -14,7 +14,7 @@ export default async function CustomerOrdersPage() {
     <div className="space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold">My Rental Orders</h1>
       <div className="rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-muted/50">
             <tr>
               <th className="text-left p-4">Gear</th>

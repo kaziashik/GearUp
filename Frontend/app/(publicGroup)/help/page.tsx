@@ -105,10 +105,10 @@ export default function HelpPage() {
     <div>
       {/* Hero Section */}
       <section className="gradient-hero border-b">
-        <div className="container mx-auto px-4 py-16 md:py-20">
+        <div className="container mx-auto px-4 py-8 md:py-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">How Can We Help?</h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">How Can We Help?</h1>
+            <p className="text-sm md:text-base text-muted-foreground mb-6">
               Search our knowledge base or contact support for assistance
             </p>
             <div className="relative max-w-xl mx-auto">
@@ -116,7 +116,7 @@ export default function HelpPage() {
               <input
                 type="text"
                 placeholder="Search for help..."
-                className="w-full pl-12 pr-4 py-4 rounded-lg border-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary text-lg"
+                className="w-full pl-12 pr-4 py-3 rounded-lg border-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>

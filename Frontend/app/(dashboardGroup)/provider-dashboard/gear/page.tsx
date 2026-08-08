@@ -15,7 +15,7 @@ export default async function ProviderGearPage() {
         <Button asChild><Link href="/provider-dashboard/gear/new">Add Gear</Link></Button>
       </div>
       <div className="rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[700px]">
           <thead className="bg-muted/50">
             <tr>
               <th className="text-left p-4">Name</th>
