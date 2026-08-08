@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,9 +14,12 @@ import { formatCurrency } from "@/lib/utils";
 const FALLBACK_IMAGE = "https://placehold.co/800x600/0f766e/ffffff/png?text=GearUp";
 
 export function GearCard({ gear }: { gear: GearItem }) {
-  const [imgSrc, setImgSrc] = useState(
-    gear.images?.[0] || FALLBACK_IMAGE
-  );
+  const primaryImage = gear.images?.[0] || FALLBACK_IMAGE;
+  const [imgSrc, setImgSrc] = useState(primaryImage);
+
+  useEffect(() => {
+    setImgSrc(primaryImage);
+  }, [primaryImage]);
 
   return (
     <motion.div
@@ -34,6 +37,7 @@ export function GearCard({ gear }: { gear: GearItem }) {
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width:768px) 100vw, 33vw"
+              unoptimized
               onError={() => setImgSrc(FALLBACK_IMAGE)}
             />
             {gear.availableQuantity > 0 ? (

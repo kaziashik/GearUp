@@ -196,6 +196,7 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
                 fill
                 className="object-cover"
                 priority
+                unoptimized
                 sizes="(max-width: 768px) 100vw, 50vw"
                 onError={() => markImageError(selectedImageIdx)}
               />
@@ -248,6 +249,7 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
                       fill
                       className="object-cover"
                       sizes="80px"
+                      unoptimized
                       onError={() => markImageError(idx)}
                     />
                   </button>

@@ -60,7 +60,12 @@ export default function GearBrowsePage() {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
-    params.set("page", "1");
+
+    // Reset to page 1 only when filters/sort change — not when paginating
+    if (key !== "page") {
+      params.set("page", "1");
+    }
+
     router.push(`/gear?${params.toString()}`);
   }
 
@@ -220,9 +225,12 @@ export default function GearBrowsePage() {
                 </div>
                 <div className="mt-6">
                   <Pagination
-                    page={meta.page}
-                    totalPages={meta.totalPages}
-                    onPageChange={(p) => updateParams("page", String(p))}
+                    page={page}
+                    totalPages={meta.totalPages || 1}
+                    onPageChange={(p) => {
+                      updateParams("page", String(p));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                   />
                 </div>
               </>

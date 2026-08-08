@@ -17,14 +17,22 @@ import {
 } from "lucide-react";
 import { Dumbbell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { apiFetch } from "@/lib/server-api";
-import { GearItem } from "@/lib/types";
+import { API_URL } from "@/lib/api";
+import { GearItem, ApiResponse } from "@/lib/types";
 import { GearCard } from "./_components/GearCard";
 import { AnimatedHeroBackground } from "./_components/AnimatedHeroBackground";
 
 export default async function HomePage() {
-  const res = await apiFetch<GearItem[]>("/api/gear?limit=6&available=true");
-  const featured = res.data || [];
+  let featured: GearItem[] = [];
+  try {
+    const res = await fetch(`${API_URL}/api/gear?limit=6&available=true`, {
+      cache: "no-store",
+    });
+    const json = (await res.json()) as ApiResponse<GearItem[]>;
+    featured = json.data || [];
+  } catch {
+    featured = [];
+  }
 
   return (
     <div>

@@ -61,22 +61,27 @@ export const getAccessToken = async () => {
   if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
     const result = await getNewAccessToken();
     if (result.success && result.data) {
-      // Set the new tokens
-      cookieStore.set("accessToken", result.data.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24, // 1 day
-        path: "/",
-      });
-      if (result.data.refreshToken) {
-        cookieStore.set("refreshToken", result.data.refreshToken, {
+      // Cookie writes only work in Server Actions / Route Handlers.
+      // In Server Components, still return the fresh token for this request.
+      try {
+        cookieStore.set("accessToken", result.data.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24, // 1 day
           path: "/",
         });
+        if (result.data.refreshToken) {
+          cookieStore.set("refreshToken", result.data.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: "/",
+          });
+        }
+      } catch {
+        // Ignore cookie write errors outside Server Actions
       }
       return result.data.accessToken;
     }
