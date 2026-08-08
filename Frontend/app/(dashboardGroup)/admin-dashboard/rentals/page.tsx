@@ -112,7 +112,7 @@ export default function AdminRentalsPage() {
                     <td className="p-4">
                       <div>
                         <p className="font-medium">{r.customer?.name}</p>
-                        <p className="text-xs text-muted-foreground">{r.user?.email}</p>
+                        <p className="text-xs text-muted-foreground">{r.customer?.email}</p>
                       </div>
                     </td>
                     <td className="p-4 text-muted-foreground">
