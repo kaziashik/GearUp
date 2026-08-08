@@ -1,7 +1,8 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
 import { getParam } from "../../utils/getParam";
-import sendResponse from "../../utils/sendResponse";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { paymentService } from "./payment.service";
 
@@ -39,11 +40,8 @@ const confirmPayment = catchAsync(async (req, res) => {
 
   const payment = await paymentService.confirmStripePayment(sessionId);
 
-  sendResponse({
-    res,
-    message: "Payment confirmed successfully",
-    data: payment,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Payment confirmed successfully", data: payment,
+   });
 });
 
 const getMyPayments = catchAsync(async (req, res) => {
@@ -51,11 +49,8 @@ const getMyPayments = catchAsync(async (req, res) => {
     (req as AuthRequest).user!.userId
   );
 
-  sendResponse({
-    res,
-    message: "Payment history retrieved successfully",
-    data: payments,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Payment history retrieved successfully", data: payments,
+   });
 });
 
 const getPaymentById = catchAsync(async (req, res) => {
@@ -66,11 +61,8 @@ const getPaymentById = catchAsync(async (req, res) => {
     authReq.user!.role
   );
 
-  sendResponse({
-    res,
-    message: "Payment retrieved successfully",
-    data: payment,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Payment retrieved successfully", data: payment,
+   });
 });
 
 export const paymentController = {

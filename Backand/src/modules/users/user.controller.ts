@@ -1,6 +1,7 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { userService } from "./user.service";
 
@@ -18,7 +19,7 @@ const changePasswordSchema = z.object({
 const getMyProfile = catchAsync(async (req, res) => {
   const user = await userService.getMyProfile((req as AuthRequest).user!.userId);
 
-  sendResponse({ res, message: "Profile retrieved successfully", data: user });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Profile retrieved successfully", data: user  });
 });
 
 const updateMyProfile = catchAsync(async (req, res) => {
@@ -28,14 +29,14 @@ const updateMyProfile = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({ res, message: "Profile updated successfully", data: user });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Profile updated successfully", data: user  });
 });
 
 const changePassword = catchAsync(async (req, res) => {
   const data = changePasswordSchema.parse(req.body);
   await userService.changePassword((req as AuthRequest).user!.userId, data);
 
-  sendResponse({ res, message: "Password changed successfully" });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Password changed successfully" });
 });
 
 const deleteAccount = catchAsync(async (req, res) => {
@@ -44,7 +45,7 @@ const deleteAccount = catchAsync(async (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
 
-  sendResponse({ res, message: "Account deleted successfully" });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Account deleted successfully" });
 });
 
 export const userController = {

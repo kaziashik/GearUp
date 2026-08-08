@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
+import { sendResponse } from "../../utils/sendResponse";
 import { paymentService } from "./payment.service";
 
 export const stripeWebhook = catchAsync(async (req: Request, res: Response) => {
@@ -17,9 +18,6 @@ export const stripeWebhook = catchAsync(async (req: Request, res: Response) => {
 
   const result = await paymentService.handleStripeWebhook(req.body, signature);
 
-  sendResponse({
-    res,
-    message: "Webhook processed successfully",
-    data: result,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Webhook processed successfully", data: result,
+   });
 });

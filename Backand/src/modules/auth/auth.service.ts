@@ -8,11 +8,7 @@ import {
 import prisma from "../../lib/prisma";
 import { config } from "../../config";
 import { googleClient } from "../../lib/googleAuth";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../../utils/jwt";
+import { jwtUtils } from "../../utils/jwt";
 import { badRequest, conflict, forbidden, unauthorized } from "../../utils/AppError";
 import {
   AuthUser,
@@ -20,6 +16,7 @@ import {
   LoginInput,
   RegisterInput,
 } from "./auth.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 const sanitizeUser = (user: AuthUser) => {
   const { ...rest } = user;
@@ -50,12 +47,27 @@ const setTokenCookies = (
 };
 
 const issueAuthTokens = async (
-  user: Pick<User, "id" | "email" | "role">,
+  user: Pick<User, "id" | "email" | "role" | "name">,
   res: { cookie: (name: string, val: string, opts: object) => void }
 ) => {
-  const tokenPayload = { userId: user.id, email: user.email, role: user.role };
-  const accessToken = generateAccessToken(tokenPayload);
-  const refreshToken = generateRefreshToken(tokenPayload);
+  const tokenPayload = { 
+    userId: user.id, 
+    email: user.email, 
+    role: user.role,
+    name: user.name 
+  };
+  
+  const accessToken = jwtUtils.createToken(
+    tokenPayload,
+    config.jwtAccessSecret,
+    config.jwtAccessExpiresIn
+  );
+  
+  const refreshToken = jwtUtils.createToken(
+    tokenPayload,
+    config.jwtRefreshSecret,
+    config.jwtRefreshExpiresIn
+  );
 
   await prisma.user.update({
     where: { id: user.id },
@@ -299,9 +311,18 @@ const refreshToken = async (
     throw unauthorized("Refresh token required");
   }
 
-  const decoded = verifyRefreshToken(token);
+  const verifiedToken = jwtUtils.verifyToken(token, config.jwtRefreshSecret);
+  
+  if (!verifiedToken.success) {
+    throw unauthorized(verifiedToken.error || "Invalid refresh token");
+  }
 
-  const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+  const { userId } = verifiedToken.data as JwtPayload;
+
+  const user = await prisma.user.findUnique({ 
+    where: { id: userId },
+    select: { id: true, email: true, name: true, role: true, status: true, refreshToken: true }
+  });
 
   if (!user || user.refreshToken !== token) {
     throw unauthorized("Invalid refresh token");

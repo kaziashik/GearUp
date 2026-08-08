@@ -1,28 +1,25 @@
 import { Response } from "express";
 
-interface SendResponseOptions<T> {
-  res: Response;
-  statusCode?: number;
-  success?: boolean;
-  message: string;
-  data?: T;
-  meta?: Record<string, unknown>;
-}
-
-const sendResponse = <T>({
-  res,
-  statusCode = 200,
-  success = true,
-  message,
-  data,
-  meta,
-}: SendResponseOptions<T>) => {
-  res.status(statusCode).json({
-    success,
-    message,
-    data,
-    meta,
-  });
+type TMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages?: number;
 };
 
-export default sendResponse;
+type TResponseData<T> = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: T;
+  meta?: TMeta;
+};
+
+export const sendResponse = <T>(res: Response, responseData: TResponseData<T>) => {
+  res.status(responseData.statusCode).json({
+    success: responseData.success,
+    message: responseData.message,
+    data: responseData.data,
+    meta: responseData.meta,
+  });
+};

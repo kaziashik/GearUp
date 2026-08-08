@@ -1,7 +1,8 @@
 import { z } from "zod";
-import catchAsync from "../../utils/catchAsync";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status";
 import { getParam } from "../../utils/getParam";
-import sendResponse from "../../utils/sendResponse";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { reviewService } from "./review.service";
 
@@ -19,22 +20,15 @@ const createReview = catchAsync(async (req, res) => {
     data
   );
 
-  sendResponse({
-    res,
-    statusCode: 201,
-    message: "Review submitted successfully",
-    data: review,
-  });
+  sendResponse(res, { success: true, statusCode: 201, message: "Review submitted successfully", data: review,
+   });
 });
 
 const getGearReviews = catchAsync(async (req, res) => {
   const reviews = await reviewService.getGearReviews(getParam(req.params.gearId));
 
-  sendResponse({
-    res,
-    message: "Reviews retrieved successfully",
-    data: reviews,
-  });
+  sendResponse(res, { success: true, statusCode: httpStatus.OK, message: "Reviews retrieved successfully", data: reviews,
+   });
 });
 
 export const reviewController = {

@@ -1,10 +1,11 @@
 import { Response } from "express";
 import { z } from "zod";
 import { Role } from "../../../prisma/generated/prisma";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 import { AuthRequest } from "../../middlewares/auth";
 import { authService } from "./auth.service";
+import httpStatus from "http-status";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -30,9 +31,9 @@ const register = catchAsync(async (req, res) => {
   const data = registerSchema.parse(req.body);
   const result = await authService.register(data, res as Response);
 
-  sendResponse({
-    res,
-    statusCode: 201,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
     message: "Registration successful",
     data: result,
   });
@@ -42,8 +43,9 @@ const login = catchAsync(async (req, res) => {
   const data = loginSchema.parse(req.body);
   const result = await authService.login(data, res as Response);
 
-  sendResponse({
-    res,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
     message: "Login successful",
     data: result,
   });
@@ -53,8 +55,9 @@ const googleLogin = catchAsync(async (req, res) => {
   const data = googleLoginSchema.parse(req.body);
   const result = await authService.googleLogin(data, res as Response);
 
-  sendResponse({
-    res,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
     message: "Google login successful",
     data: result,
   });
@@ -63,8 +66,9 @@ const googleLogin = catchAsync(async (req, res) => {
 const getMe = catchAsync(async (req, res) => {
   const user = await authService.getMe((req as AuthRequest).user!.userId);
 
-  sendResponse({
-    res,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
     message: "User retrieved successfully",
     data: user,
   });
@@ -74,8 +78,9 @@ const refreshToken = catchAsync(async (req, res) => {
   const token = req.cookies?.refreshToken || req.body.refreshToken;
   const result = await authService.refreshToken(token, res as Response);
 
-  sendResponse({
-    res,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
     message: "Token refreshed successfully",
     data: result,
   });
@@ -84,8 +89,9 @@ const refreshToken = catchAsync(async (req, res) => {
 const logout = catchAsync(async (req, res) => {
   await authService.logout((req as AuthRequest).user!.userId, res as Response);
 
-  sendResponse({
-    res,
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
     message: "Logged out successfully",
   });
 });
