@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { decodeTokenPayload } from "@/utils/jwt";
-import { Role } from "@/lib/types";
+import { NextRequest } from "next/server";
+import { JwtPayload } from "jsonwebtoken";
+import { jwtUtils } from "@/utils/jwt";
+import { cookies } from "next/headers";
+import { getNewAccessToken } from "@/service/refreshToken";
 
 const AUTH_ROUTES = ["/login", "/register"];
 const PUBLIC_ROUTES = [
@@ -16,12 +18,58 @@ const PUBLIC_ROUTES = [
   "/terms",
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  const accessToken = request.cookies.get("accessToken")?.value;
-  const payload = accessToken ? decodeTokenPayload(accessToken) : null;
-  const userRole = payload?.role as Role | null;
+  const cookiesStore = await cookies();
+
+  let accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+
+  let decodedAccessToken = accessToken
+    ? jwtUtils.verifyToken(
+        accessToken,
+        process.env.JWT_ACCESS_SECRET as string
+      )
+    : null;
+  const decodedRefreshToken = refreshToken
+    ? jwtUtils.verifyToken(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET as string
+      )
+    : null;
+
+  // If access token expired but refresh token is valid, get new access token
+  if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
+    const result = await getNewAccessToken();
+
+    if (result.success) {
+      const newAccessToken = result.data.accessToken;
+
+      cookiesStore.set("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24, // 1 day
+        sameSite: "lax",
+      });
+
+      accessToken = newAccessToken;
+      decodedAccessToken = jwtUtils.verifyToken(
+        accessToken!,
+        process.env.JWT_ACCESS_SECRET as string
+      );
+    }
+  }
+
+  // If token is invalid, clear cookies
+  if (!decodedAccessToken?.success && accessToken) {
+    cookiesStore.delete("accessToken");
+  }
+
+  let userRole = null;
+  if (decodedAccessToken?.success && decodedAccessToken.data) {
+    userRole = (decodedAccessToken.data as JwtPayload).role;
+  }
 
   // User is logged in and trying to access login or register page, redirect to dashboard
   if (accessToken && AUTH_ROUTES.includes(pathname)) {
@@ -52,15 +100,18 @@ export function middleware(request: NextRequest) {
   );
 
   // Authenticated pages Protection
-  // Note: Token verification with refresh happens in server actions, not here
-  if (!accessToken && !isPublic && !isAuthRoute) {
+  if (!decodedAccessToken?.success && !isPublic && !isAuthRoute) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // Authorization: Role based access control
-  if (pathname.startsWith("/customer-dashboard") && userRole !== "CUSTOMER" && userRole !== "ADMIN") {
+  if (
+    pathname.startsWith("/customer-dashboard") &&
+    userRole !== "CUSTOMER" &&
+    userRole !== "ADMIN"
+  ) {
     return NextResponse.redirect(new URL("/", request.url));
   } else if (
     pathname.startsWith("/admin-dashboard") &&
