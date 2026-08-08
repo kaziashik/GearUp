@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,6 +18,7 @@ export default function GearBrowsePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
+  const [showFilters, setShowFilters] = useState(false);
 
   const page = Number(searchParams.get("page") || 1);
   const search = searchParams.get("search") || "";
@@ -80,13 +81,36 @@ export default function GearBrowsePage() {
       </section>
 
       <div className="container mx-auto px-4 py-10">
+        {/* Mobile Filter Button */}
+        <div className="lg:hidden mb-4">
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            {showFilters ? "Hide Filters" : "Show Filters"}
+            {hasFilters && <span className="ml-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs">{[search, categoryId, brand, minPrice, maxPrice].filter(Boolean).length}</span>}
+          </Button>
+        </div>
+
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
-          <aside className="lg:col-span-1">
-            <div className="rounded-xl border bg-card p-6 space-y-5 sticky top-20">
-              <div className="flex items-center gap-2 font-semibold text-lg">
-                <SlidersHorizontal className="h-5 w-5 text-primary" />
-                Filters
+          <aside className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}>
+            <div className="rounded-xl border bg-card p-6 space-y-5 lg:sticky top-20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold text-lg">
+                  <SlidersHorizontal className="h-5 w-5 text-primary" />
+                  Filters
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="lg:hidden"
+                  onClick={() => setShowFilters(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
 
               {/* Search */}

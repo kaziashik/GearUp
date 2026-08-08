@@ -136,39 +136,83 @@ export function Navbar({ user }: { user?: User | null }) {
       </div>
 
       {open && (
-        <div className="md:hidden border-t p-4 space-y-3 animate-fade-in bg-background">
+        <div className="md:hidden border-t p-4 space-y-2 animate-fade-in bg-background">
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="block py-2 hover:text-primary" onClick={() => setOpen(false)}>
+            <Link 
+              key={link.href} 
+              href={link.href} 
+              className={cn(
+                "block py-3 px-4 rounded-lg transition-colors",
+                pathname === link.href ? "bg-primary/10 text-primary font-medium" : "hover:bg-accent"
+              )}
+              onClick={() => setOpen(false)}
+            >
               {link.label}
             </Link>
           ))}
           {user && (
-            <Link href={getDashboardPath(user.role)} className="block py-2 hover:text-primary" onClick={() => setOpen(false)}>
-              Dashboard
-            </Link>
+            <>
+              <Link 
+                href={getDashboardPath(user.role)} 
+                className={cn(
+                  "block py-3 px-4 rounded-lg transition-colors",
+                  pathname.includes("dashboard") ? "bg-primary/10 text-primary font-medium" : "hover:bg-accent"
+                )}
+                onClick={() => setOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href={`${getDashboardPath(user.role)}/profile`}
+                className="block py-3 px-4 rounded-lg transition-colors hover:bg-accent"
+                onClick={() => setOpen(false)}
+              >
+                <UserIcon className="inline h-4 w-4 mr-2" />
+                My Profile
+              </Link>
+            </>
           )}
-          <div className="flex gap-2 pt-2 border-t">
+          <div className="flex gap-2 pt-3 border-t mt-3">
             {user ? (
               <div className="w-full space-y-2">
-                <div className="text-sm font-medium px-2">{user.name}</div>
+                <div className="flex items-center gap-2 px-2 py-2">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20">
+                    {user.image ? (
+                      <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <UserIcon className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  </div>
+                </div>
                 <Button variant="outline" asChild className="w-full">
-                  <Link href="/help">Help & Support</Link>
+                  <Link href="/help" onClick={() => setOpen(false)}>
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    Help & Support
+                  </Link>
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={handleLogout}
+                  onClick={() => {
+                    handleLogout();
+                    setOpen(false);
+                  }}
                   className="w-full"
                 >
+                  <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
               </div>
             ) : (
               <>
                 <Button variant="outline" asChild className="flex-1">
-                  <Link href="/login">Login</Link>
+                  <Link href="/login" onClick={() => setOpen(false)}>Login</Link>
                 </Button>
                 <Button asChild className="flex-1">
-                  <Link href="/register">Register</Link>
+                  <Link href="/register" onClick={() => setOpen(false)}>Get Started</Link>
                 </Button>
               </>
             )}
