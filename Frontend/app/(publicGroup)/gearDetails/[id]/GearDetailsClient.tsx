@@ -48,13 +48,13 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
       .catch(() => {});
 
     // Fetch related gear (same category)
-    if (gear.categoryId) {
-      fetch(`${API_URL}/api/gear?categoryId=${gear.categoryId}&limit=3`)
+    if (gear.category?.id) {
+      fetch(`${API_URL}/api/gear?categoryId=${gear.category.id}&limit=3`)
         .then((r) => r.json())
         .then((j) => setRelatedGear((j.data || []).filter((g: GearItem) => g.id !== gear.id).slice(0, 3)))
         .catch(() => {});
     }
-  }, [gear.id, gear.categoryId]);
+  }, [gear.id, gear.category?.id]);
 
   async function handleRent() {
     if (!startDate || !endDate) {
@@ -144,7 +144,7 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
               )}
               {gear.availableQuantity < 1 && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <Badge variant="destructive" className="text-lg px-4 py-2">Currently Unavailable</Badge>
+                  <Badge variant="secondary" className="text-lg px-4 py-2 bg-red-600">Currently Unavailable</Badge>
                 </div>
               )}
             </div>
@@ -212,8 +212,8 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Condition</p>
-                  <p className="font-semibold">{gear.condition}</p>
+                  <p className="text-xs text-muted-foreground">Available</p>
+                  <p className="font-semibold">{gear.availableQuantity} units</p>
                 </div>
               </div>
             </div>
@@ -338,7 +338,7 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">You Might Also Like</h2>
               <Button variant="outline" asChild>
-                <Link href={`/gear?categoryId=${gear.categoryId}`}>View More</Link>
+                <Link href={`/gear?categoryId=${gear.category?.id}`}>View More</Link>
               </Button>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
