@@ -1,44 +1,130 @@
 import Link from "next/link";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Github } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="border-t bg-muted/30 mt-auto">
-      <div className="container mx-auto px-4 py-12 grid md:grid-cols-4 gap-8">
-        <div className="space-y-3">
+      <div className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        {/* Brand Section */}
+        <div className="space-y-4 lg:col-span-2">
           <div className="flex items-center gap-2 font-bold text-lg">
-            <Dumbbell className="h-5 w-5 text-primary" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Dumbbell className="h-4 w-4" />
+            </div>
             GearUp
           </div>
-          <p className="text-sm text-muted-foreground">
-            Rent premium sports & outdoor gear instantly. Adventure made accessible.
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Rent premium sports & outdoor gear instantly. Adventure made accessible for everyone, everywhere.
           </p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Mail className="h-4 w-4 text-primary" />
+              <a href="mailto:support@gearup.com" className="hover:text-primary transition-colors">
+                support@gearup.com
+              </a>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Phone className="h-4 w-4 text-primary" />
+              <a href="tel:+1234567890" className="hover:text-primary transition-colors">
+                +1 (234) 567-890
+              </a>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 text-primary" />
+              <span>San Francisco, CA 94102</span>
+            </div>
+          </div>
         </div>
+
+        {/* Explore Links */}
         <div>
-          <h4 className="font-semibold mb-3">Explore</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link href="/gear" className="hover:text-primary">Browse Gear</Link></li>
-            <li><Link href="/about" className="hover:text-primary">About Us</Link></li>
-            <li><Link href="/services" className="hover:text-primary">Services</Link></li>
+          <h4 className="font-semibold mb-4">Explore</h4>
+          <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
+            <li><Link href="/gear" className="hover:text-primary transition-colors">Browse Gear</Link></li>
+            <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+            <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
+            <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
           </ul>
         </div>
+
+        {/* For Partners */}
         <div>
-          <h4 className="font-semibold mb-3">For Partners</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link href="/register?role=PROVIDER" className="hover:text-primary">Become a Provider</Link></li>
-            <li><Link href="/contact" className="hover:text-primary">Contact Sales</Link></li>
+          <h4 className="font-semibold mb-4">For Partners</h4>
+          <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <li><Link href="/register?role=PROVIDER" className="hover:text-primary transition-colors">Become a Provider</Link></li>
+            <li><Link href="/provider-dashboard" className="hover:text-primary transition-colors">Provider Dashboard</Link></li>
+            <li><Link href="/help" className="hover:text-primary transition-colors">How It Works</Link></li>
+            <li><Link href="/contact" className="hover:text-primary transition-colors">Partner Support</Link></li>
           </ul>
         </div>
+
+        {/* Support & Legal */}
         <div>
-          <h4 className="font-semibold mb-3">Support</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link href="/contact" className="hover:text-primary">Help Center</Link></li>
-            <li><Link href="/contact" className="hover:text-primary">Terms & Privacy</Link></li>
+          <h4 className="font-semibold mb-4">Support</h4>
+          <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <li><Link href="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
+            <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+            <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+            <li><Link href="/contact" className="hover:text-primary transition-colors">Contact Support</Link></li>
           </ul>
         </div>
       </div>
-      <div className="border-t py-4 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} GearUp. All rights reserved.
+
+      {/* Bottom Bar */}
+      <div className="border-t">
+        <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} GearUp. All rights reserved.
+          </p>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Facebook"
+            >
+              <Facebook className="h-5 w-5" />
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Twitter"
+            >
+              <Twitter className="h-5 w-5" />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a
+              href="https://github.com/kaziashik/GearUp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="GitHub"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );
