@@ -52,18 +52,10 @@ export const getAccessToken = async () => {
       )
     : null;
 
+  // If access token is expired but refresh token is valid, return null
+  // Cookie refresh will be handled by middleware, not here
   if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
-    const result = await getNewAccessToken();
-    if (result.success) {
-      let newAccessToken = result.data.accessToken;
-      cookieStore.set("accessToken", newAccessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24, // 1 day
-        sameSite: "lax",
-      });
-      accessToken = newAccessToken;
-    }
+    return null; // Let middleware handle the refresh
   }
 
   return accessToken;
