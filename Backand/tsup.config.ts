@@ -2,8 +2,8 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: ["src/server.ts"],
-  format: ["cjs"],
-  target: "node18",
+  format: ["esm"],
+  target: "esnext",
   outDir: "dist",
   clean: true,
   bundle: true,
@@ -12,8 +12,9 @@ export default defineConfig({
   minify: false,
   external: ["@prisma/client", ".prisma/client"],
   noExternal: [],
-  banner: {
-    js: `import { createRequire } from 'module';
-const require = createRequire(import.meta.url);`,
+  outExtension({ format }) {
+    return {
+      js: `.js`,
+    };
   },
 });
