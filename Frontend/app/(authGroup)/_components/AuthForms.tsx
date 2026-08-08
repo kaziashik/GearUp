@@ -308,7 +308,7 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
               text="signup_with"
               theme="outline"
               size="large"
-              width="100%"
+              width="400"
             />
           </div>
         )}
