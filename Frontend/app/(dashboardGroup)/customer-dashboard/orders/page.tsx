@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CancelButton } from "./CancelButton";
 import { apiFetch } from "@/lib/server-api";
 import { RentalOrder } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -32,20 +33,22 @@ export default async function CustomerOrdersPage() {
                 </td>
                 <td className="p-4"><StatusBadge status={order.status} /></td>
                 <td className="p-4 font-medium">{formatCurrency(Number(order.totalAmount))}</td>
-                <td className="p-4 space-x-2">
-                  {order.status === "CONFIRMED" && (
-                    <Button size="sm" asChild><Link href={`/customer-dashboard/orders/${order.id}/pay`}>Pay</Link></Button>
-                  )}
-                  {order.status === "RETURNED" && (
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/customer-dashboard/orders/${order.id}/review`}>Review</Link>
-                    </Button>
-                  )}
-                  {["PLACED", "CONFIRMED"].includes(order.status) && (
-                    <form action={`/api/rentals/${order.id}/cancel`} method="POST">
-                      <Button size="sm" variant="destructive" type="submit">Cancel</Button>
-                    </form>
-                  )}
+                <td className="p-4">
+                  <div className="flex flex-col gap-2 min-w-[100px]">
+                    {["PLACED", "CONFIRMED"].includes(order.status) && (
+                      <Button size="sm" className="w-full" asChild>
+                        <Link href={`/customer-dashboard/orders/${order.id}/pay`}>Pay</Link>
+                      </Button>
+                    )}
+                    {["PLACED", "CONFIRMED"].includes(order.status) && (
+                      <CancelButton orderId={order.id} />
+                    )}
+                    {order.status === "RETURNED" && (
+                      <Button size="sm" variant="outline" className="w-full" asChild>
+                        <Link href={`/customer-dashboard/orders/${order.id}/review`}>Review</Link>
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

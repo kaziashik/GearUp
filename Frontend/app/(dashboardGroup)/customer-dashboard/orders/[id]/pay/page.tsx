@@ -20,6 +20,13 @@ export default function PayOrderPage() {
   }, [id]);
 
   async function pay(method: "STRIPE" | "SSLCOMMERZ") {
+    if (method === "SSLCOMMERZ") {
+      toast.error("SSLCommerz service is not available currently. Please pay with Stripe.", {
+        duration: 5000,
+      });
+      return;
+    }
+
     setLoading(true);
     const res = await fetch("/api/payments/create", {
       method: "POST",

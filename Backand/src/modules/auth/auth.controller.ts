@@ -13,6 +13,7 @@ const registerSchema = z.object({
   role: z.enum([Role.CUSTOMER, Role.PROVIDER]),
   phone: z.string().optional(),
   address: z.string().optional(),
+  image: z.string().optional(),
 });
 
 const loginSchema = z.object({

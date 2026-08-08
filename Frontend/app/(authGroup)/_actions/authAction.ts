@@ -46,6 +46,7 @@ export async function registerAction(data: {
   role: Role;
   phone?: string;
   address?: string;
+  image?: string;
 }) {
   const result = await authRequest<AuthResponse>("/api/auth/register", data);
   if (result.success && result.data) {

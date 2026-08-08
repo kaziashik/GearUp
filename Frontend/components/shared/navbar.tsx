@@ -81,9 +81,13 @@ export function Navbar({ user }: { user?: User | null }) {
           {user ? (
             <DropdownMenu
               trigger={
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border hover:bg-accent">
-                  <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
-                    <UserIcon className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border hover:bg-accent cursor-pointer">
+                  <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20">
+                    {user.image ? (
+                      <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <UserIcon className="h-4 w-4 text-primary" />
+                    )}
                   </div>
                   <span className="text-sm font-medium">{user.name?.split(" ")[0] || "User"}</span>
                 </div>
@@ -93,9 +97,13 @@ export function Navbar({ user }: { user?: User | null }) {
                 <p className="text-sm font-medium">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
+              <DropdownMenuItem href={`${getDashboardPath(user.role)}/profile`}>
+                <UserIcon className="inline h-4 w-4 mr-2" />
+                My Profile
+              </DropdownMenuItem>
               <DropdownMenuItem href={`${getDashboardPath(user.role)}`}>
                 <Settings className="inline h-4 w-4 mr-2" />
-                Settings
+                Dashboard
               </DropdownMenuItem>
               <DropdownMenuItem href="/help">
                 <HelpCircle className="inline h-4 w-4 mr-2" />

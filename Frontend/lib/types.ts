@@ -18,6 +18,7 @@ export interface User {
   role: Role;
   phone?: string | null;
   address?: string | null;
+  image?: string | null;
   status: UserStatus;
   authProvider?: AuthProvider;
   emailVerified?: boolean;

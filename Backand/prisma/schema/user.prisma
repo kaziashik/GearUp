@@ -5,6 +5,7 @@ model User {
   name          String
   phone         String?
   address       String?
+  image         String?
   role          Role         @default(CUSTOMER)
   status        UserStatus   @default(ACTIVE)
   authProvider  AuthProvider @default(CREDENTIALS)

@@ -7,6 +7,7 @@ export interface RegisterInput {
   role: Role;
   phone?: string;
   address?: string;
+  image?: string;
 }
 
 export interface LoginInput {
@@ -26,6 +27,7 @@ export interface AuthUser {
   role: Role;
   phone: string | null;
   address: string | null;
+  image: string | null;
   status: string;
   createdAt: Date;
 }

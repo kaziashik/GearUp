@@ -234,6 +234,25 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
             <Label htmlFor="phone">Phone (optional)</Label>
             <Input id="phone" name="phone" type="tel" />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="image">Profile Image (optional)</Label>
+            <div className="flex items-center gap-4">
+              {imagePreview && (
+                <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-primary">
+                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                </div>
+              )}
+              <Input 
+                id="image" 
+                name="image" 
+                type="file" 
+                accept="image/*"
+                onChange={handleImageChange}
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Maximum file size: 5MB (will be compressed automatically)</p>
+          </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
