@@ -11,7 +11,7 @@ import { GearItem } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 
 export function GearCard({ gear }: { gear: GearItem }) {
-  const image = gear.images?.[0] || "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800";
+  const image = gear.images?.[0] || "https://placehold.co/800x600/14b8a6/fff?text=Gear+Image";
 
   return (
     <motion.div

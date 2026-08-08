@@ -68,19 +68,7 @@ export default function GearBrowsePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="gradient-hero border-b">
-        <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Browse Gear</h1>
-            <p className="text-lg text-muted-foreground">
-              Find the perfect equipment for your next adventure from our curated collection
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div className="container mx-auto px-4 py-10">
+      <div className="w-full px-3 md:px-4 py-6">
         {/* Mobile Filter Button */}
         <div className="lg:hidden mb-4">
           <Button 
@@ -94,44 +82,44 @@ export default function GearBrowsePage() {
           </Button>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
+        <div className="grid lg:grid-cols-4 gap-3 md:gap-4">
           {/* Filters Sidebar */}
           <aside className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <div className="rounded-xl border bg-card p-6 space-y-5 lg:sticky top-20">
+            <div className="p-2 md:p-3 space-y-3 lg:sticky top-20">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-semibold text-lg">
-                  <SlidersHorizontal className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-1.5 font-semibold text-sm">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
                   Filters
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="lg:hidden"
+                  className="lg:hidden h-7 w-7"
                   onClick={() => setShowFilters(false)}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
 
               {/* Search */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Search</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
                     placeholder="Search gear..."
                     defaultValue={search}
-                    className="pl-9"
+                    className="pl-8 h-8 text-sm"
                     onKeyDown={(e) => e.key === "Enter" && updateParams("search", (e.target as HTMLInputElement).value)}
                   />
                 </div>
               </div>
 
               {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Category</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Category</label>
                 <Select value={categoryId || "all"} onValueChange={(v) => updateParams("categoryId", v === "all" ? "" : v)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -146,37 +134,40 @@ export default function GearBrowsePage() {
               </div>
 
               {/* Brand Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Brand</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Brand</label>
                 <Input
                   placeholder="Filter by brand"
                   defaultValue={brand}
+                  className="h-8 text-sm"
                   onBlur={(e) => updateParams("brand", e.target.value)}
                 />
               </div>
 
               {/* Price Range */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Price Range (per day)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium">Price Range (per day)</label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     placeholder="Min $"
                     type="number"
                     defaultValue={minPrice}
+                    className="h-8 text-sm"
                     onBlur={(e) => updateParams("minPrice", e.target.value)}
                   />
                   <Input
                     placeholder="Max $"
                     type="number"
                     defaultValue={maxPrice}
+                    className="h-8 text-sm"
                     onBlur={(e) => updateParams("maxPrice", e.target.value)}
                   />
                 </div>
               </div>
 
               {hasFilters && (
-                <Button variant="outline" className="w-full" onClick={() => router.push("/gear")}>
-                  Clear All Filters
+                <Button variant="outline" size="sm" className="w-full h-8 text-xs" onClick={() => router.push("/gear")}>
+                  Clear All
                 </Button>
               )}
             </div>
@@ -185,7 +176,7 @@ export default function GearBrowsePage() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Results Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div>
                 <p className="text-sm text-muted-foreground">
                   {loading ? "Loading..." : `${meta.total || 0} items found`}
@@ -194,7 +185,7 @@ export default function GearBrowsePage() {
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                 <Select value={sort || "default"} onValueChange={(v) => updateParams("sort", v === "default" ? "" : v)}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[150px] md:w-[180px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -210,28 +201,30 @@ export default function GearBrowsePage() {
 
             {/* Gear Grid */}
             {loading ? (
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <GearCardSkeleton key={i} />
                 ))}
               </div>
             ) : gear.length === 0 ? (
-              <div className="text-center py-20 border rounded-xl">
+              <div className="text-center py-16 border rounded-xl">
                 <p className="text-muted-foreground mb-2">No gear found</p>
                 <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
               </div>
             ) : (
               <>
-                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {gear.map((g) => (
                     <GearCard key={g.id} gear={g} />
                   ))}
                 </div>
-                <Pagination
-                  page={meta.page}
-                  totalPages={meta.totalPages}
-                  onPageChange={(p) => updateParams("page", String(p))}
-                />
+                <div className="mt-6">
+                  <Pagination
+                    page={meta.page}
+                    totalPages={meta.totalPages}
+                    onPageChange={(p) => updateParams("page", String(p))}
+                  />
+                </div>
               </>
             )}
           </div>

@@ -81,10 +81,10 @@ export default function ContactPage() {
     <div>
       {/* Hero */}
       <section className="gradient-hero border-b">
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-8 md:py-10">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-            <p className="text-lg text-muted-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Contact Us</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
               Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
             </p>
           </div>

@@ -9,13 +9,22 @@ import { ShoppingBag, CreditCard, Package, TrendingUp } from "lucide-react";
 import { GrowthChart, StatusPieChart } from "@/components/charts/DashboardCharts";
 
 export default async function CustomerDashboardPage() {
-  const [rentalsRes, paymentsRes] = await Promise.all([
-    apiFetch<RentalOrder[]>("/api/rentals"),
-    apiFetch<Payment[]>("/api/payments"),
-  ]);
+  let rentals: RentalOrder[] = [];
+  let payments: Payment[] = [];
+  
+  try {
+    const [rentalsRes, paymentsRes] = await Promise.all([
+      apiFetch<RentalOrder[]>("/api/rentals"),
+      apiFetch<Payment[]>("/api/payments"),
+    ]);
 
-  const rentals = rentalsRes.data || [];
-  const payments = paymentsRes.data || [];
+    rentals = rentalsRes.data || [];
+    payments = paymentsRes.data || [];
+  } catch (error) {
+    console.error("Dashboard data fetch error:", error);
+    // Continue with empty arrays if fetch fails
+  }
+
   const activeRentals = rentals.filter((r) => !["RETURNED", "CANCELLED"].includes(r.status));
   const totalSpent = payments.reduce((sum, p) => sum + (p.status === "COMPLETED" ? Number(p.amount) : 0), 0);
 

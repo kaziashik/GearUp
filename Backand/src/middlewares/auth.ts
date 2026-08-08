@@ -7,6 +7,16 @@ import { config } from "../config";
 import { catchAsync } from "../utils/catchAsync";
 import { JwtPayload } from "jsonwebtoken";
 
+// Export AuthRequest type
+export interface AuthRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: Role;
+    name: string;
+  };
+}
+
 declare global {
   namespace Express {
     interface Request {
@@ -34,7 +44,7 @@ export const authenticate = catchAsync(
     }
 
     // Verify token using new jwtUtils
-    const verifiedToken = jwtUtils.verifyToken(token, config.jwtAccessSecret);
+    const verifiedToken = jwtUtils.verifyToken(token, config.jwt.accessSecret);
     
     if (!verifiedToken.success) {
       throw unauthorized(verifiedToken.error || "Invalid token");

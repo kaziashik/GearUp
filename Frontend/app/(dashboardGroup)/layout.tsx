@@ -1,10 +1,14 @@
-import { redirect } from "next/navigation";
 import { getMe } from "@/service/getMe";
 import { DashboardSidebar } from "./_components/DashboardSidebar";
+import { AuthenticationFallback } from "./_components/AuthenticationFallback";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getMe();
-  if (!user) redirect("/login");
+  
+  // If no user, show loading and redirect to login
+  if (!user) {
+    return <AuthenticationFallback />;
+  }
 
   return (
     <div className="flex min-h-screen">

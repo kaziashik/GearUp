@@ -35,9 +35,9 @@ export function GearDetailsClient({ gear }: { gear: GearItem }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [relatedGear, setRelatedGear] = useState<GearItem[]>([]);
 
-  const images = gear.images && gear.images.length > 0
-    ? gear.images
-    : ["https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1200"];
+  const images = gear.images && gear.images.length > 0 
+    ? gear.images 
+    : ["https://placehold.co/1200x800/14b8a6/fff?text=Gear+Image"];
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {

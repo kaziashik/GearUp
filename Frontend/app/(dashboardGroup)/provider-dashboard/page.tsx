@@ -7,13 +7,21 @@ import { Package, ShoppingCart, Clock, DollarSign } from "lucide-react";
 import { RevenueChart, StatusPieChart } from "@/components/charts/DashboardCharts";
 
 export default async function ProviderDashboardPage() {
-  const [gearRes, ordersRes] = await Promise.all([
-    apiFetch<GearItem[]>("/api/provider/gear"),
-    apiFetch<RentalOrder[]>("/api/provider/orders"),
-  ]);
+  let gear: GearItem[] = [];
+  let orders: RentalOrder[] = [];
+  
+  try {
+    const [gearRes, ordersRes] = await Promise.all([
+      apiFetch<GearItem[]>("/api/provider/gear"),
+      apiFetch<RentalOrder[]>("/api/provider/orders"),
+    ]);
 
-  const gear = gearRes.data || [];
-  const orders = ordersRes.data || [];
+    gear = gearRes.data || [];
+    orders = ordersRes.data || [];
+  } catch (error) {
+    console.error("Provider dashboard data fetch error:", error);
+  }
+
   const pending = orders.filter((o) => o.status === "PLACED");
   const completed = orders.filter((o) => o.status === "RETURNED");
   const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);

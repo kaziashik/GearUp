@@ -59,14 +59,14 @@ const issueAuthTokens = async (
   
   const accessToken = jwtUtils.createToken(
     tokenPayload,
-    config.jwtAccessSecret,
-    config.jwtAccessExpiresIn
+    config.jwt.accessSecret,
+    config.jwt.accessExpiresIn
   );
   
   const refreshToken = jwtUtils.createToken(
     tokenPayload,
-    config.jwtRefreshSecret,
-    config.jwtRefreshExpiresIn
+    config.jwt.refreshSecret,
+    config.jwt.refreshExpiresIn
   );
 
   await prisma.user.update({
@@ -110,6 +110,7 @@ const register = async (
       role: input.role,
       phone: input.phone,
       address: input.address,
+      image: input.image,
       authProvider: AuthProvider.CREDENTIALS,
       emailVerified: false,
     },
@@ -120,6 +121,7 @@ const register = async (
       role: true,
       phone: true,
       address: true,
+      image: true,
       status: true,
       authProvider: true,
       emailVerified: true,
@@ -311,7 +313,7 @@ const refreshToken = async (
     throw unauthorized("Refresh token required");
   }
 
-  const verifiedToken = jwtUtils.verifyToken(token, config.jwtRefreshSecret);
+  const verifiedToken = jwtUtils.verifyToken(token, config.jwt.refreshSecret);
   
   if (!verifiedToken.success) {
     throw unauthorized(verifiedToken.error || "Invalid refresh token");
