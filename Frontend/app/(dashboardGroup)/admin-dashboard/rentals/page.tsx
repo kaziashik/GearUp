@@ -32,8 +32,8 @@ export default function AdminRentalsPage() {
   }, [page]);
 
   const filtered = rentals.filter((r) => {
-    const matchesSearch = r.user?.name.toLowerCase().includes(search.toLowerCase()) ||
-      r.user?.email.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = r.customer?.name.toLowerCase().includes(search.toLowerCase()) ||
+      r.customer?.email.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -111,8 +111,8 @@ export default function AdminRentalsPage() {
                     <td className="p-4 font-mono text-xs">{r.id.slice(0, 8)}</td>
                     <td className="p-4">
                       <div>
-                        <p className="font-medium">{r.user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{r.user?.email}</p>
+                        <p className="font-medium">{r.customer?.name}</p>
+                        <p className="text-xs text-muted-foreground">{r.customer?.email}</p>
                       </div>
                     </td>
                     <td className="p-4 text-muted-foreground">

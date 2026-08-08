@@ -10,14 +10,14 @@ async function setAuthCookies(accessToken: string, refreshToken: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 15,
+    maxAge: 60 * 60 * 24, // 1 day (actual expiry controlled by backend JWT)
     path: "/",
   });
   cookieStore.set("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
   });
 }

@@ -1,67 +1,85 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decodeTokenPayload, getDashboardPath } from "@/utils/jwt";
+import { decodeTokenPayload } from "@/utils/jwt";
 import { Role } from "@/lib/types";
 
-const publicPaths = ["/", "/gear", "/about", "/contact", "/services", "/success", "/cancel"];
-const authPaths = ["/login", "/register"];
-
-function isPublicPath(pathname: string) {
-  if (publicPaths.includes(pathname)) return true;
-  if (pathname.startsWith("/gearDetails/")) return true;
-  return false;
-}
-
-function isAuthPath(pathname: string) {
-  return authPaths.some((p) => pathname.startsWith(p));
-}
-
-function isDashboardPath(pathname: string) {
-  return (
-    pathname.startsWith("/customer-dashboard") ||
-    pathname.startsWith("/provider-dashboard") ||
-    pathname.startsWith("/admin-dashboard") ||
-    pathname.startsWith("/dashboard")
-  );
-}
+const AUTH_ROUTES = ["/login", "/register"];
+const PUBLIC_ROUTES = [
+  "/",
+  "/gear",
+  "/about",
+  "/contact",
+  "/services",
+  "/blog",
+  "/help",
+  "/privacy",
+  "/terms",
+];
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get("accessToken")?.value;
-  const payload = token ? decodeTokenPayload(token) : null;
-  const role = payload?.role as Role | undefined;
+  const pathname = request.nextUrl.pathname;
 
-  if (isAuthPath(pathname) && token && role) {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const payload = accessToken ? decodeTokenPayload(accessToken) : null;
+  const userRole = payload?.role as Role | null;
+
+  // User is logged in and trying to access login or register page, redirect to dashboard
+  if (accessToken && AUTH_ROUTES.includes(pathname)) {
+    if (userRole === "CUSTOMER") {
+      return NextResponse.redirect(
+        new URL("/customer-dashboard", request.url)
+      );
+    } else if (userRole === "PROVIDER") {
+      return NextResponse.redirect(
+        new URL("/provider-dashboard", request.url)
+      );
+    } else if (userRole === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin-dashboard", request.url));
+    } else {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
-  if (isDashboardPath(pathname) && !token) {
+  const isPublic =
+    PUBLIC_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(route + "/")
+    ) ||
+    pathname.startsWith("/gearDetails/") ||
+    pathname.startsWith("/payment/");
+
+  const isAuthRoute = AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
+  // Authenticated pages Protection
+  // Note: Token verification with refresh happens in server actions, not here
+  if (!accessToken && !isPublic && !isAuthRoute) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    loginUrl.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname.startsWith("/customer-dashboard") && role && role !== "CUSTOMER" && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (pathname.startsWith("/provider-dashboard") && role && role !== "PROVIDER" && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (pathname.startsWith("/admin-dashboard") && role && role !== "ADMIN") {
-    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
-  }
-
-  if (!isPublicPath(pathname) && !isAuthPath(pathname) && !isDashboardPath(pathname) && pathname.startsWith("/payment")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  // Authorization: Role based access control
+  if (pathname.startsWith("/customer-dashboard") && userRole !== "CUSTOMER" && userRole !== "ADMIN") {
+    return NextResponse.redirect(new URL("/", request.url));
+  } else if (
+    pathname.startsWith("/admin-dashboard") &&
+    userRole !== "ADMIN"
+  ) {
+    return NextResponse.redirect(new URL("/", request.url));
+  } else if (
+    pathname.startsWith("/provider-dashboard") &&
+    userRole !== "PROVIDER" &&
+    userRole !== "ADMIN"
+  ) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$).*)",
+  ],
 };

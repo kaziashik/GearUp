@@ -42,7 +42,7 @@ export default function AdminGearPage() {
     const matchesSearch =
       g.name.toLowerCase().includes(search.toLowerCase()) ||
       g.brand.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || g.categoryId === categoryFilter;
+    const matchesCategory = categoryFilter === "all" || g.category?.id === categoryFilter;
     const matchesAvailability =
       availabilityFilter === "all" ||
       (availabilityFilter === "available" && g.availableQuantity > 0) ||
@@ -138,8 +138,8 @@ export default function AdminGearPage() {
                     <td className="p-4 font-semibold">{formatCurrency(Number(g.pricePerDay))}</td>
                     <td className="p-4">
                       <Badge
-                        variant={g.availableQuantity > 0 ? "default" : "destructive"}
-                        className={g.availableQuantity > 0 ? "bg-green-600" : ""}
+                        variant={g.availableQuantity > 0 ? "default" : "secondary"}
+                        className={g.availableQuantity > 0 ? "bg-green-600" : "bg-red-600"}
                       >
                         {g.availableQuantity} available
                       </Badge>

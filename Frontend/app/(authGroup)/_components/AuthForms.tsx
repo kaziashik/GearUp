@@ -157,11 +157,52 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<Role>(defaultRole || "CUSTOMER");
+  const [imagePreview, setImagePreview] = useState<string>("");
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      e.target.value = "";
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      e.target.value = "";
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     const form = new FormData(e.currentTarget);
+
+    // Handle image compression if image is present
+    let compressedImage: string | undefined;
+    const imageFile = (form.get("image") as File);
+    if (imageFile && imageFile.size > 0) {
+      try {
+        const { compressImage } = await import("@/lib/imageUtils");
+        compressedImage = await compressImage(imageFile, 400, 400, 0.8);
+      } catch (error) {
+        toast.error("Failed to process image");
+        setLoading(false);
+        return;
+      }
+    }
 
     const { registerAction } = await import("../_actions/authAction");
     const result = await registerAction({
@@ -170,6 +211,7 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
       password: form.get("password") as string,
       role,
       phone: (form.get("phone") as string) || undefined,
+      image: compressedImage,
     });
     setLoading(false);
 

@@ -139,8 +139,8 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="p-4">
                       <Badge
-                        variant={u.status === "ACTIVE" ? "default" : "destructive"}
-                        className={u.status === "ACTIVE" ? "bg-green-600" : ""}
+                        variant={u.status === "ACTIVE" ? "default" : "secondary"}
+                        className={u.status === "ACTIVE" ? "bg-green-600" : "bg-red-600"}
                       >
                         {u.status}
                       </Badge>
