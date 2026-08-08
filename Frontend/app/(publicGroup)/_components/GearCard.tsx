@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,8 +11,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GearItem } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 
+const FALLBACK_IMAGE = "https://placehold.co/800x600/0f766e/ffffff/png?text=GearUp";
+
 export function GearCard({ gear }: { gear: GearItem }) {
-  const image = gear.images?.[0] || "https://placehold.co/800x600/14b8a6/fff?text=Gear+Image";
+  const [imgSrc, setImgSrc] = useState(
+    gear.images?.[0] || FALLBACK_IMAGE
+  );
 
   return (
     <motion.div
@@ -20,47 +25,67 @@ export function GearCard({ gear }: { gear: GearItem }) {
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
     >
-      <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <div className="relative h-48 overflow-hidden">
-          <Image
-            src={image}
-            alt={gear.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width:768px) 100vw, 33vw"
-          />
-          {gear.availableQuantity > 0 ? (
-            <Badge className="absolute top-3 right-3 bg-emerald-600">Available</Badge>
-          ) : (
-            <Badge variant="secondary" className="absolute top-3 right-3">Unavailable</Badge>
-          )}
-        </div>
-        <CardContent className="p-4 space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="text-xs text-muted-foreground">{gear.brand}</p>
-              <h3 className="font-semibold line-clamp-1">{gear.name}</h3>
-            </div>
-            {gear.averageRating != null && (
-              <div className="flex items-center gap-1 text-sm shrink-0">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                {gear.averageRating.toFixed(1)}
-              </div>
+      <Link href={`/gearDetails/${gear.id}`} className="block h-full">
+        <Card className="group h-full overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+          <div className="relative h-48 overflow-hidden bg-muted">
+            <Image
+              src={imgSrc}
+              alt={gear.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width:768px) 100vw, 33vw"
+              onError={() => setImgSrc(FALLBACK_IMAGE)}
+            />
+            {gear.availableQuantity > 0 ? (
+              <Badge className="absolute top-3 right-3 bg-emerald-600">Available</Badge>
+            ) : (
+              <Badge variant="secondary" className="absolute top-3 right-3">
+                Unavailable
+              </Badge>
+            )}
+            {gear.category?.name && (
+              <Badge
+                variant="secondary"
+                className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm"
+              >
+                {gear.category.name}
+              </Badge>
             )}
           </div>
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-bold text-primary">
-              {formatCurrency(Number(gear.pricePerDay))}
-              <span className="text-sm font-normal text-muted-foreground">/day</span>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{gear.brand}</p>
+                <h3 className="font-semibold line-clamp-1 group-hover:text-primary transition-colors">
+                  {gear.name}
+                </h3>
+              </div>
+              {gear.averageRating != null && (
+                <div className="flex items-center gap-1 text-sm shrink-0">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  {gear.averageRating.toFixed(1)}
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+              {gear.description || "Premium rental gear ready for your next adventure."}
             </p>
-            <Button size="sm" asChild>
-              <Link href={`/gearDetails/${gear.id}`}>
-                Rent <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <p className="text-lg font-bold text-primary">
+                {formatCurrency(Number(gear.pricePerDay))}
+                <span className="text-sm font-normal text-muted-foreground">/day</span>
+              </p>
+              <Button
+                size="sm"
+                className="pointer-events-none"
+                tabIndex={-1}
+              >
+                View <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
     </motion.div>
   );
 }
