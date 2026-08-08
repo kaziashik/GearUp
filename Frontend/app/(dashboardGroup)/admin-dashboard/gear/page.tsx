@@ -42,7 +42,7 @@ export default function AdminGearPage() {
     const matchesSearch =
       g.name.toLowerCase().includes(search.toLowerCase()) ||
       g.brand.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || g.categoryId === categoryFilter;
+    const matchesCategory = categoryFilter === "all" || g.category?.id === categoryFilter;
     const matchesAvailability =
       availabilityFilter === "all" ||
       (availabilityFilter === "available" && g.availableQuantity > 0) ||
