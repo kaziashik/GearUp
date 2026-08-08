@@ -157,6 +157,26 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<Role>(defaultRole || "CUSTOMER");
+  const [imagePreview, setImagePreview] = useState<string>("");
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      e.target.value = "";
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
