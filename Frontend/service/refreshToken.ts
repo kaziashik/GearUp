@@ -52,11 +52,36 @@ export const getAccessToken = async () => {
       )
     : null;
 
-  // If access token is expired but refresh token is valid, return null
-  // Cookie refresh will be handled by middleware, not here
-  if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
-    return null; // Let middleware handle the refresh
+  // If access token is valid, return it
+  if (decodedAccessToken?.success) {
+    return accessToken;
   }
 
-  return accessToken;
+  // If access token is expired/invalid but refresh token is valid, get new token
+  if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
+    const result = await getNewAccessToken();
+    if (result.success && result.data) {
+      // Set the new tokens
+      cookieStore.set("accessToken", result.data.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24, // 1 day
+        path: "/",
+      });
+      if (result.data.refreshToken) {
+        cookieStore.set("refreshToken", result.data.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+          path: "/",
+        });
+      }
+      return result.data.accessToken;
+    }
+  }
+
+  // Both tokens invalid or refresh failed
+  return null;
 };

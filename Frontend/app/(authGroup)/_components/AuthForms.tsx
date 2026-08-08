@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { loginAction, googleLoginAction } from "../_actions/authAction";
-import { getDashboardPath } from "@/utils/jwt";
 import { Role } from "@/lib/types";
 
 export function LoginForm() {
@@ -30,11 +29,9 @@ export function LoginForm() {
     const result = await loginAction(email, password);
     setLoading(false);
 
-    if (result.success && result.data) {
+    if (result.success && (result as any).dashboardPath) {
       toast.success("Welcome back!");
-      const path = redirect || getDashboardPath(result.data.user.role);
-      router.push(path);
-      router.refresh();
+      window.location.href = (result as any).dashboardPath; // Hard redirect to ensure cookies are sent
     } else {
       toast.error(result.message || "Login failed");
     }
@@ -45,10 +42,9 @@ export function LoginForm() {
     const result = await googleLoginAction(credential);
     setLoading(false);
 
-    if (result.success && result.data) {
+    if (result.success && (result as any).dashboardPath) {
       toast.success("Signed in with Google!");
-      router.push(redirect || getDashboardPath(result.data.user.role));
-      router.refresh();
+      window.location.href = (result as any).dashboardPath;
     } else {
       toast.error(result.message || "Google login failed");
     }
@@ -215,10 +211,9 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
     });
     setLoading(false);
 
-    if (result.success && result.data) {
+    if (result.success && (result as any).dashboardPath) {
       toast.success("Account created successfully!");
-      router.push(getDashboardPath(result.data.user.role));
-      router.refresh();
+      window.location.href = (result as any).dashboardPath;
     } else {
       toast.error(result.message || "Registration failed");
     }
@@ -229,10 +224,9 @@ export function RegisterForm({ defaultRole }: { defaultRole?: Role }) {
     const result = await googleLoginAction(credential, role);
     setLoading(false);
 
-    if (result.success && result.data) {
+    if (result.success && (result as any).dashboardPath) {
       toast.success("Account created with Google!");
-      router.push(getDashboardPath(result.data.user.role));
-      router.refresh();
+      window.location.href = (result as any).dashboardPath;
     } else {
       toast.error(result.message || "Google sign-up failed");
     }
