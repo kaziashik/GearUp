@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +54,13 @@ export function LoginForm() {
     }
   }
 
+  function fillDemoCredentials(email: string, password: string) {
+    const emailInput = document.getElementById("email") as HTMLInputElement;
+    const passwordInput = document.getElementById("password") as HTMLInputElement;
+    if (emailInput) emailInput.value = email;
+    if (passwordInput) passwordInput.value = password;
+  }
+
   return (
     <Card className="w-full max-w-md shadow-xl animate-fade-in">
       <CardHeader className="text-center">
@@ -60,6 +68,43 @@ export function LoginForm() {
         <CardDescription>Sign in to your GearUp account</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Demo Login Buttons */}
+        <div className="p-4 rounded-lg bg-secondary/10 border border-secondary/20 space-y-3">
+          <p className="text-sm font-medium text-center">Quick Demo Login</p>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillDemoCredentials("customer@gearup.com", "Customer@123")}
+              className="text-xs"
+            >
+              Customer
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillDemoCredentials("provider@gearup.com", "Provider@123")}
+              className="text-xs"
+            >
+              Provider
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fillDemoCredentials("admin@gearup.com", "Admin@123")}
+              className="text-xs"
+            >
+              Admin
+            </Button>
+          </div>
+          <p className="text-xs text-center text-muted-foreground">
+            Click to auto-fill credentials, then sign in
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
