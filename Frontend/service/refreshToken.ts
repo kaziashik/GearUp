@@ -1,11 +1,54 @@
 "use server";
 
-import { jwtUtils } from "@/utils/jwt";
 import { cookies } from "next/headers";
+import { API_URL } from "@/lib/api";
+
+type JwtPayload = { exp?: number };
+
+/** Decode JWT payload without verifying (backend verifies signatures). */
+function decodePayload(token: string): JwtPayload | null {
+  try {
+    const part = token.split(".")[1];
+    if (!part) return null;
+    const normalized = part.replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(normalized)) as JwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+function isExpiringSoon(token: string, skewMs = 30_000): boolean {
+  const payload = decodePayload(token);
+  if (!payload?.exp) return true;
+  return payload.exp * 1000 <= Date.now() + skewMs;
+}
+
+async function setTokenCookies(accessToken: string, refreshToken?: string) {
+  const cookieStore = await cookies();
+  try {
+    cookieStore.set("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24,
+      path: "/",
+    });
+    if (refreshToken) {
+      cookieStore.set("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+    }
+  } catch {
+    // Cookie writes only work in Server Actions / Route Handlers
+  }
+}
 
 export const getNewAccessToken = async () => {
   const cookieStore = await cookies();
-
   const refreshToken = cookieStore.get("refreshToken")?.value || null;
 
   if (!refreshToken) {
@@ -15,78 +58,48 @@ export const getNewAccessToken = async () => {
     };
   }
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh-token`,
-    {
-      method: "POST",
-      headers: {
-        Cookie: `refreshToken=${refreshToken}`,
-      },
-      cache: "no-store",
-    }
-  );
+  const res = await fetch(`${API_URL}/api/auth/refresh-token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `refreshToken=${refreshToken}`,
+    },
+    body: JSON.stringify({ refreshToken }),
+    cache: "no-store",
+  });
 
   const result = await res.json();
   return result;
 };
 
+/**
+ * Return a usable access token for server-side API calls.
+ * Does NOT verify JWT secrets locally (avoids Vercel secret mismatch / login loops).
+ * Backend verifies signatures on each request.
+ */
 export const getAccessToken = async () => {
   const cookieStore = await cookies();
-  let accessToken = cookieStore.get("accessToken")?.value || null;
+  const accessToken = cookieStore.get("accessToken")?.value || null;
   const refreshToken = cookieStore.get("refreshToken")?.value || null;
 
   if (!accessToken && !refreshToken) {
     return null;
   }
 
-  const decodedAccessToken = accessToken
-    ? jwtUtils.verifyToken(
-        accessToken,
-        process.env.JWT_ACCESS_SECRET as string
-      )
-    : null;
-  const decodedRefreshToken = refreshToken
-    ? jwtUtils.verifyToken(
-        refreshToken,
-        process.env.JWT_REFRESH_SECRET as string
-      )
-    : null;
-
-  // If access token is valid, return it
-  if (decodedAccessToken?.success) {
+  // Fresh enough access token → use it
+  if (accessToken && !isExpiringSoon(accessToken)) {
     return accessToken;
   }
 
-  // If access token is expired/invalid but refresh token is valid, get new token
-  if (!decodedAccessToken?.success && decodedRefreshToken?.success) {
+  // Access missing/expiring → refresh via backend
+  if (refreshToken) {
     const result = await getNewAccessToken();
-    if (result.success && result.data) {
-      // Cookie writes only work in Server Actions / Route Handlers.
-      // In Server Components, still return the fresh token for this request.
-      try {
-        cookieStore.set("accessToken", result.data.accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 60 * 60 * 24, // 1 day
-          path: "/",
-        });
-        if (result.data.refreshToken) {
-          cookieStore.set("refreshToken", result.data.refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-            path: "/",
-          });
-        }
-      } catch {
-        // Ignore cookie write errors outside Server Actions
-      }
-      return result.data.accessToken;
+    if (result.success && result.data?.accessToken) {
+      await setTokenCookies(result.data.accessToken, result.data.refreshToken);
+      return result.data.accessToken as string;
     }
   }
 
-  // Both tokens invalid or refresh failed
-  return null;
+  // Last resort: still return access token if present (backend may accept)
+  return accessToken;
 };

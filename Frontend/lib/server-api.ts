@@ -46,6 +46,7 @@ export async function apiFetch<T>(
 
     if (accessToken) {
       (headers as Record<string, string>)["Cookie"] = `accessToken=${accessToken}`;
+      (headers as Record<string, string>)["Authorization"] = `Bearer ${accessToken}`;
     }
 
     const res = await fetch(`${API_URL}${path}`, {

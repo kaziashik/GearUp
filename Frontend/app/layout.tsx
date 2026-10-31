@@ -8,8 +8,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GearUp — Rent Sports & Outdoor Gear Instantly",
+  title: {
+    default: "GearUp",
+    template: "%s | GearUp",
+  },
   description: "Browse, rent, and return premium sports and outdoor equipment with GearUp.",
+  applicationName: "GearUp",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

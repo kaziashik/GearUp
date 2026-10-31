@@ -13,11 +13,14 @@ paymentRouter.post(
   stripeWebhook
 );
 
+// Confirm is public: Stripe session_id is verified with Stripe API.
+// Keeps success-page confirm working even if auth cookies drop after checkout.
+paymentRouter.post("/confirm", paymentController.confirmPayment);
+
 paymentRouter.use(authenticate);
 paymentRouter.use(authorize(Role.CUSTOMER, Role.ADMIN));
 
 paymentRouter.post("/create", paymentController.createPayment);
-paymentRouter.post("/confirm", paymentController.confirmPayment);
 paymentRouter.get("/", paymentController.getMyPayments);
 paymentRouter.get("/:id", paymentController.getPaymentById);
 

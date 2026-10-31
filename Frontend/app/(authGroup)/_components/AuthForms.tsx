@@ -13,10 +13,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { loginAction, googleLoginAction } from "../_actions/authAction";
 import { Role } from "@/lib/types";
 
+function safeRedirectPath(value: string | null): string {
+  if (!value) return "";
+  // Same-origin relative paths only
+  if (!value.startsWith("/") || value.startsWith("//")) return "";
+  return value;
+}
+
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "";
+  const redirectTo = safeRedirectPath(
+    searchParams.get("redirectTo") || searchParams.get("redirect")
+  );
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -31,7 +39,7 @@ export function LoginForm() {
 
     if (result.success && (result as any).dashboardPath) {
       toast.success("Welcome back!");
-      window.location.href = (result as any).dashboardPath; // Hard redirect to ensure cookies are sent
+      window.location.href = redirectTo || (result as any).dashboardPath;
     } else {
       toast.error(result.message || "Login failed");
     }
@@ -44,7 +52,7 @@ export function LoginForm() {
 
     if (result.success && (result as any).dashboardPath) {
       toast.success("Signed in with Google!");
-      window.location.href = (result as any).dashboardPath;
+      window.location.href = redirectTo || (result as any).dashboardPath;
     } else {
       toast.error(result.message || "Google login failed");
     }

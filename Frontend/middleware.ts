@@ -88,12 +88,15 @@ export function middleware(request: NextRequest) {
     return clearAuthCookies(response);
   }
 
-  // Protected routes require a valid token
+  // Protected routes require a valid access token.
+  // Keep refreshToken so the server can refresh the session.
   if (!tokenValid && !isPublic && !isAuthRoute) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirectTo", pathname);
     const response = NextResponse.redirect(loginUrl);
-    if (accessToken) clearAuthCookies(response);
+    if (accessToken) {
+      response.cookies.delete("accessToken");
+    }
     return response;
   }
 
@@ -104,17 +107,17 @@ export function middleware(request: NextRequest) {
       userRole !== "CUSTOMER" &&
       userRole !== "ADMIN"
     ) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL(getDashboardPath(userRole), request.url));
     }
     if (pathname.startsWith("/admin-dashboard") && userRole !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL(getDashboardPath(userRole), request.url));
     }
     if (
       pathname.startsWith("/provider-dashboard") &&
       userRole !== "PROVIDER" &&
       userRole !== "ADMIN"
     ) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL(getDashboardPath(userRole), request.url));
     }
   }
 
