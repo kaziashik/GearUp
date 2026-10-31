@@ -14,6 +14,7 @@ import paymentRouter from "./modules/payment/payment.router";
 import providerRouter from "./modules/provider/provider.router";
 import adminRouter from "./modules/admin/admin.router";
 import reviewRouter from "./modules/review/review.router";
+import { requestLogger } from "./middlewares/requestLogger";
 
 const app: Application = express();
 
@@ -23,6 +24,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(requestLogger); // Add the request logger middleware here
 
 app.use("/api/payments/webhook/stripe", express.raw({ type: "application/json" }));
 
